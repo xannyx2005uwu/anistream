@@ -15,8 +15,11 @@
         <div class="nav-container">
             <h1 class="logo cursor-pointer" onclick="router.navigate('/')">Anistream</h1>
             <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Cerca un anime...">
-                <button id="searchBtn">Cerca</button>
+                <div class="search-input-row">
+                    <input type="text" id="searchInput" placeholder="Cerca un anime..." autocomplete="off">
+                    <button id="searchBtn">Cerca</button>
+                </div>
+                <div id="autocompleteList" class="autocomplete-list" style="display:none;"></div>
             </div>
             <div class="nav-links">
                 <a href="#" onclick="router.navigate('/')">Home</a>

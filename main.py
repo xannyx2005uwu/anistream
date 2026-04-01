@@ -263,42 +263,44 @@ def get_anime_episodes(
     en: str = Query(None, description="The anime English title (fallback)"),
     c: int = Query(None, description="Total episodes count from anilist")
 ):
+    def build_eps(link):
+        anime = aw.Anime(link)
+        result = []
+        for ep in anime.getEpisodes():
+            raw_url = getattr(ep.links[0], 'link', '') if len(ep.links) > 0 else ''
+            if "download-file.php?id=" in raw_url:
+                raw_url = raw_url.replace("download-file.php?id=", "")
+            result.append({"number": ep.number, "link": raw_url})
+        return result
+
     try:
         if not title or title.strip() == "None": raise Exception("Invalid title")
         aw_link = get_aw_animelink(title, english_title=en)
         if not aw_link:
             raise Exception("Cannot find anime in AnimeWorld via title search")
-        
-        anime = aw.Anime(aw_link)
-        episodes = anime.getEpisodes()
-        eps_data = []
-        for ep in episodes:
-            raw_url = getattr(ep.links[0], 'link', '') if len(ep.links) > 0 else ''
-            # Se è un direct download di SweetPixel, convertilo in un link MP4 puro per streaming
-            if "download-file.php?id=" in raw_url:
-                raw_url = raw_url.replace("download-file.php?id=", "")
-            
-            eps_data.append({
-                "number": ep.number,
-                "link": raw_url,
-            })
 
-        if not eps_data: raise Exception("No episodes found natively")
-        return {"data": eps_data}
+        eps_data = build_eps(aw_link)
+        if not eps_data: raise Exception("No episodes found")
+
+        # Search for Italian Dub (ITA) version
+        ita_data = []
+        try:
+            ita_link = get_aw_animelink(title + " (ITA)", english_title=(en + " (ITA)") if en else None)
+            if ita_link and ita_link != aw_link:
+                ita_data = build_eps(ita_link)
+        except Exception as ita_err:
+            print("ITA search failed:", ita_err)
+
+        return {"data": eps_data, "ita_data": ita_data}
+
     except Exception as e:
         print("Fallback episodes:", e)
-        # Se 'c' non è fornito (anime non ancora uscito / count '?'), mostra solo 1 placeholder invece di 24 fake.
         target_c = c if c is not None else 1
         max_eps = max(1, min(target_c, 5000))
-        # Use a nice UI data-URI instead of a blocked iframe
         html_content = "<html><body style='background:#111;color:#a855f7;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;text-align:center'><h2>Episodio in Arrivo / Stream Non Trovato</h2></body></html>"
         import urllib.parse
         data_uri = "data:text/html;charset=utf-8," + urllib.parse.quote(html_content)
-        
-        eps_data = [
-            {"number": str(i+1), "link": data_uri} for i in range(max_eps)
-        ]
-        return {"data": eps_data}
+        return {"data": [{"number": str(i+1), "link": data_uri} for i in range(max_eps)], "ita_data": []}
 
 # Serve the static files (Frontend code)
 static_dir = os.path.join(os.path.dirname(__file__), "static")

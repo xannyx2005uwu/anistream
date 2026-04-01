@@ -6,7 +6,13 @@ const state = {
     isSearching: false,
     filterGenre: "ALL",
     filterSort: "DEFAULT",
-    isLoading: false
+    isLoading: false,
+    // Autocomplete
+    autocompleteTimer: null,
+    // Episode audio mode: 'sub' or 'ita'
+    currentSubEps: [],
+    currentItaEps: [],
+    audioMode: 'sub'
 };
 
 // Router singleton
@@ -159,10 +165,91 @@ function renderHome() {
 }
 
 // Search Binding
-searchBtn.addEventListener('click', () => searchAnime(searchInput.value));
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') searchAnime(searchInput.value);
+searchBtn.addEventListener('click', () => {
+    closeAutocomplete();
+    searchAnime(searchInput.value);
 });
+searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { closeAutocomplete(); searchAnime(searchInput.value); }
+});
+searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAutocomplete();
+});
+
+// Autocomplete with debounce
+searchInput.addEventListener('input', () => {
+    clearTimeout(state.autocompleteTimer);
+    const query = searchInput.value.trim();
+    if (!query || query.length < 2) { closeAutocomplete(); return; }
+    state.autocompleteTimer = setTimeout(() => showAutocomplete(query), 200);
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-container')) closeAutocomplete();
+});
+
+function closeAutocomplete() {
+    const list = document.getElementById('autocompleteList');
+    if (list) list.innerHTML = '';
+    const list2 = document.getElementById('autocompleteList');
+    if (list2) list2.style.display = 'none';
+}
+
+async function showAutocomplete(query) {
+    const list = document.getElementById('autocompleteList');
+    if (!list) return;
+
+    // Build candidates from in-memory catalog first (instant)
+    const lq = query.toLowerCase();
+    const seen = new Set();
+    const candidates = [];
+    Object.values(state.catalog).forEach(row => {
+        row.forEach(anime => {
+            if (!seen.has(anime.link) && anime.name.toLowerCase().includes(lq)) {
+                seen.add(anime.link);
+                candidates.push(anime);
+            }
+        });
+    });
+    
+    // If few local matches, also hit the API
+    if (candidates.length < 4) {
+        try {
+            const res = await fetch(`/api/search?keyword=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            (data.data || []).forEach(anime => {
+                if (!seen.has(anime.link)) {
+                    seen.add(anime.link);
+                    candidates.push(anime);
+                }
+            });
+        } catch (_) {}
+    }
+
+    const top = candidates.slice(0, 7);
+    if (top.length === 0) { list.style.display = 'none'; return; }
+
+    list.style.display = 'block';
+    list.innerHTML = '';
+    top.forEach(a => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.innerHTML = `
+            <img src="${a.image}" alt="" class="autocomplete-img" onerror="this.style.display='none'">
+            <div class="autocomplete-info">
+                <span class="autocomplete-name">${a.name}</span>
+                <span class="autocomplete-vote">★ ${a.malVote || '?'}</span>
+            </div>
+        `;
+        // Use mousedown instead of click to fire before the document blur handler closes the list
+        item.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // prevent input blur
+            closeAutocomplete();
+            router.navigate(a.link);
+        });
+        list.appendChild(item);
+    });
+}
 
 window.applyFilters = () => {
     state.filterGenre = document.getElementById('genreFilter').value;
@@ -198,7 +285,10 @@ async function renderWatchPage(id) {
                 <div class="watch-hero">
                     <img src="${data.cover}" class="watch-hero-bg">
                     <div class="watch-hero-content">
-                        <img src="${data.poster}" class="watch-cover">
+                        <div class="watch-cover-col">
+                            <img src="${data.poster}" class="watch-cover">
+                            <div id="audioToggleBox" class="audio-toggle" style="margin-top:12px;"></div>
+                        </div>
                         <div class="watch-info">
                             <h1>${data.name}</h1>
                             <div class="watch-desc">${data.trama}</div>
@@ -239,31 +329,60 @@ async function fetchEpisodes(title, countStr, englishTitle) {
     try {
         let qs = `title=${encodeURIComponent(title)}`;
         if (englishTitle) qs += `&en=${encodeURIComponent(englishTitle)}`;
-        if (countStr && countStr !== '?' && !isNaN(countStr)) {
-            qs += `&c=${countStr}`;
-        }
+        if (countStr && countStr !== '?' && !isNaN(countStr)) qs += `&c=${countStr}`;
+
         const res = await fetch(`/api/episodes?${qs}`);
         const epData = await res.json();
-        const eps = epData.data;
         
         const grid = document.getElementById('episodesGrid');
-        if (!grid) return; // page navigated away before response arrived
-        
-        if (!eps || eps.length === 0) {
+        if (!grid) return;
+
+        state.currentSubEps = epData.data || [];
+        state.currentItaEps = epData.ita_data || [];
+        state.audioMode = 'sub';
+
+        if (state.currentSubEps.length === 0) {
             grid.innerHTML = '<p>Nessun episodio trovato sul server stream.</p>';
             return;
         }
-        
-        grid.innerHTML = eps.map(ep => `
-            <div class="episode-btn" onclick="playEpisode('${ep.link}', this)">Ep. ${ep.number}</div>
-        `).join("");
-        
+
+        renderEpisodeGrid();
+
     } catch(e) {
         console.error("Episode fetch failed", e);
         const grid = document.getElementById('episodesGrid');
         if (grid) grid.innerHTML = '<p>Lo streaming non è attualmente disponibile per questo titolo.</p>';
     }
 }
+
+function renderEpisodeGrid() {
+    const grid = document.getElementById('episodesGrid');
+    if (!grid) return;
+    const eps = state.audioMode === 'ita' ? state.currentItaEps : state.currentSubEps;
+    const hasIta = state.currentItaEps.length > 0;
+
+    // Inject toggle buttons under the poster (audioToggleBox), not in the episode grid
+    const toggleBox = document.getElementById('audioToggleBox');
+    if (toggleBox) {
+        if (hasIta) {
+            toggleBox.innerHTML = `
+                <button class="audio-btn ${state.audioMode === 'sub' ? 'active' : ''}" onclick="window.switchAudioMode('sub')">&#127244; Sub ITA</button>
+                <button class="audio-btn ${state.audioMode === 'ita' ? 'active' : ''}" onclick="window.switchAudioMode('ita')">&#127470;&#127481; Doppiato</button>
+            `;
+        } else {
+            toggleBox.innerHTML = '';
+        }
+    }
+
+    grid.innerHTML = eps.map(ep =>
+        `<div class="episode-btn" onclick="playEpisode('${ep.link}', this)">Ep. ${ep.number}</div>`
+    ).join('');
+}
+
+window.switchAudioMode = (mode) => {
+    state.audioMode = mode;
+    renderEpisodeGrid();
+};
 
 window.playEpisode = (url, btnElement) => {
     document.querySelectorAll('.episode-btn').forEach(el => el.classList.remove('active'));

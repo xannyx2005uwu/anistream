@@ -69,6 +69,11 @@ body {
 }
 .search-container {
   display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.search-input-row {
+  display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;
@@ -81,7 +86,7 @@ body {
   padding: 0.5rem 1rem;
   font-family: inherit;
   outline: none;
-  width: 250px;
+  width: 280px;
 }
 .search-container button {
   background: var(--accent-color);
@@ -96,6 +101,93 @@ body {
 }
 .search-container button:hover {
   background: var(--accent-hover);
+}
+
+/* AUTOCOMPLETE DROPDOWN */
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: rgba(18, 5, 35, 0.97);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 2000;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.65);
+  animation: fadeDropdown 0.15s ease;
+}
+@keyframes fadeDropdown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: rgba(168, 85, 247, 0.18); }
+.autocomplete-img {
+  width: 38px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.autocomplete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.autocomplete-name {
+  font-size: 0.92em;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+.autocomplete-vote {
+  font-size: 0.78em;
+  color: #c77dff;
+  font-weight: 500;
+}
+
+/* AUDIO TOGGLE (Sub / Doppiato) */
+.audio-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.audio-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.audio-btn:hover {
+  border-color: #a855f7;
+  color: #fff;
+  background: rgba(168,85,247,0.15);
+}
+.audio-btn.active {
+  background: linear-gradient(135deg, #7b2cbf, #a855f7);
+  border-color: #a855f7;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(168,85,247,0.45);
 }
 .nav-links a {
   color: var(--text-primary);
@@ -270,6 +362,12 @@ main {
   align-items: center;
   width: 100%;
   background: linear-gradient(transparent, rgba(15, 5, 24, 0.9));
+}
+.watch-cover-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
 }
 .watch-cover {
   width: 200px;
