@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Anistream</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo cursor-pointer" onclick="router.navigate('/')">Anistream</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Cerca un anime...">
+                <button id="searchBtn">Cerca</button>
+            </div>
+            <div class="nav-links">
+                <a href="#" onclick="router.navigate('/')">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="app">
+        <!-- JS mounts content here -->
+    </main>
+
+    <script src="/app.js" type="module"></script>
+</body>
+</html>

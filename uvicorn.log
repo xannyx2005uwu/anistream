@@ -1,0 +1,59 @@
+INFO:     Started server process [75698]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+Found via aw.find! keyword='Sousou no Frieren', score=1.00
+INFO:     127.0.0.1:64071 - "GET /api/episodes?title=Sousou%20no%20Frieren&en=Frieren%3A%20Beyond%20Journey%27s%20End&c=28 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64223 - "GET /play/172463 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64223 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64225 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64225 - "GET /api/anime?id=172463 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64225 - "GET /favicon.ico HTTP/1.1" 200 OK
+Found via HTML scrape! keyword='Jujutsu Kaisen', score=0.92
+INFO:     127.0.0.1:64225 - "GET /api/episodes?title=Jujutsu%20Kaisen%3A%20Shimetsu%20Kaiyuu%20-%20Zenpen&en=JUJUTSU%20KAISEN%20Season%203%3A%20The%20Culling%20Game%20Part%201&c=12 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64297 - "GET /api/anime?id=145064 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Jujutsu Kaisen', score=0.82
+INFO:     127.0.0.1:64297 - "GET /api/episodes?title=Jujutsu%20Kaisen%202nd%20Season&en=JUJUTSU%20KAISEN%20Season%202&c=23 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64353 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64408 - "GET /api/anime?id=166613 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Jigokuraku', score=0.78
+INFO:     127.0.0.1:64408 - "GET /api/episodes?title=Jigokuraku%202nd%20Season&en=Hell%E2%80%99s%20Paradise%20Season%202&c=12 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63035 - "GET /api/anime?id=20954 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Koe no Katachi', score=1.00
+INFO:     127.0.0.1:63035 - "GET /api/episodes?title=Koe%20no%20Katachi&en=A%20Silent%20Voice&c=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63109 - "GET /api/anime?id=101922 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba', score=1.00
+INFO:     127.0.0.1:63129 - "GET /api/anime?id=112151 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba: Mugen Ressha-hen', score=0.80
+INFO:     127.0.0.1:63129 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Mugen%20Ressha-hen&en=Demon%20Slayer%20-Kimetsu%20no%20Yaiba-%20The%20Movie%3A%20Mugen%20Train&c=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63109 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba&c=26 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63109 - "GET /api/anime?id=142329 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba: Yuukaku-hen', score=1.00
+INFO:     127.0.0.1:63109 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Yuukaku-hen&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba%20Entertainment%20District%20Arc&c=11 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63187 - "GET /api/anime?id=145139 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba: Katanakaji no Sato-hen', score=1.00
+INFO:     127.0.0.1:63187 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Katanakaji%20no%20Sato-hen&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba%20Swordsmith%20Village%20Arc&c=11 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63187 - "GET /api/anime?id=166240 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba: Hashira Geiko-hen', score=1.00
+INFO:     127.0.0.1:63187 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Hashira%20Geiko-hen&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba%20Hashira%20Training%20Arc&c=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63187 - "GET /api/anime?id=178788 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Demon Slayer: Kimetsu no Yaiba Infinity Castle', score=1.00
+INFO:     127.0.0.1:63187 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Mugenjou-hen%20Movie%201%20-%20Akaza%20Sairai&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba%20Infinity%20Castle&c=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63187 - "GET /api/anime?id=195200 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba', score=0.73
+INFO:     127.0.0.1:63187 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Mugenjou-hen%20Movie%202&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba%20Infinity%20Castle%20Part%202&c=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63363 - "GET /api/anime?id=195201 HTTP/1.1" 200 OK
+Fallback episodes: Cannot find anime in AnimeWorld via title search
+INFO:     127.0.0.1:63363 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Mugenjou-hen%20Movie%203&c=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63363 - "GET /api/anime?id=195200 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Kimetsu no Yaiba', score=0.73
+INFO:     127.0.0.1:63363 - "GET /api/episodes?title=Kimetsu%20no%20Yaiba%3A%20Mugenjou-hen%20Movie%202&en=Demon%20Slayer%3A%20Kimetsu%20no%20Yaiba%20Infinity%20Castle%20Part%202&c=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63445 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Sousou no Frieren', score=0.87
+INFO:     127.0.0.1:63445 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&c=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63445 - "GET /api/anime?id=209939 HTTP/1.1" 200 OK
+Fallback episodes: Cannot find anime in AnimeWorld via title search
+INFO:     127.0.0.1:63445 - "GET /api/episodes?title=Sousou%20no%20Frieren%203rd%20Season HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63445 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+Found via aw.find! keyword='Sousou no Frieren', score=0.87
+INFO:     127.0.0.1:63445 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&c=10 HTTP/1.1" 200 OK
