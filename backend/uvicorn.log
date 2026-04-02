@@ -1,0 +1,38 @@
+INFO:     Started server process [43439]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56867 - "GET /api/home HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=113415 via 'jujutsu kaisen'
+AnimeUnity ✓ [dub] anilist=113415 via 'jujutsu kaisen'
+INFO:     127.0.0.1:56870 - "GET /api/episodes?title=Jujutsu%20Kaisen&en=JUJUTSU%20KAISEN&anilist_id=113415 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56881 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56881 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56883 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56881 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56883 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56888 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56888 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56891 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56888 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56891 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56891 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=182255 via 'sousou no frieren 2'
+AnimeUnity ✓ [dub] anilist=182255 via 'sousou no frieren 2'
+INFO:     127.0.0.1:56891 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&anilist_id=182255&c=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56891 - "GET /api/anime?id=172463 HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=172463 via 'jujutsu kaisen'
+AnimeUnity ✓ [dub] anilist=172463 via 'jujutsu kaisen'
+INFO:     127.0.0.1:56891 - "GET /api/episodes?title=Jujutsu%20Kaisen%3A%20Shimetsu%20Kaiyuu%20-%20Zenpen&en=JUJUTSU%20KAISEN%20Season%203%3A%20The%20Culling%20Game%20Part%201&anilist_id=172463&c=12 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56901 - "GET /api/search?keyword=madoka HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56901 - "GET /api/anime?id=9756 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56901 - "GET /api/episodes?title=Mahou%20Shoujo%20Madoka%E2%98%86Magica&en=Puella%20Magi%20Madoka%20Magica&anilist_id=9756&c=12 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56944 - "GET /api/anime?id=11981 HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=11981 via 'mahou shoujo madoka'
+INFO:     127.0.0.1:56944 - "GET /api/episodes?title=Mahou%20Shoujo%20Madoka%E2%98%86Magica%3A%20Hangyaku%20no%20Monogatari&en=Puella%20Magi%20Madoka%20Magica%20the%20Movie%20-Rebellion-&anilist_id=11981&c=1 HTTP/1.1" 200 OK
+Stream URL: https://vixcloud.co/playlist/126806?ub=1&token=496c42607f730ac36e8c50dc76ee7d54&...
+INFO:     127.0.0.1:56944 - "GET /api/stream?ep_id=63807 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [43439]
