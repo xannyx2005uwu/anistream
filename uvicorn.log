@@ -32,3 +32,7 @@ AnimeUnity ✓ [sub] anilist=11981 via 'mahou shoujo madoka'
 INFO:     127.0.0.1:56944 - "GET /api/episodes?title=Mahou%20Shoujo%20Madoka%E2%98%86Magica%3A%20Hangyaku%20no%20Monogatari&en=Puella%20Magi%20Madoka%20Magica%20the%20Movie%20-Rebellion-&anilist_id=11981&c=1 HTTP/1.1" 200 OK
 Stream URL: https://vixcloud.co/playlist/126806?ub=1&token=496c42607f730ac36e8c50dc76ee7d54&...
 INFO:     127.0.0.1:56944 - "GET /api/stream?ep_id=63807 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [43439]

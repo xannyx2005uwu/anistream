@@ -343,12 +343,14 @@ async function fetchEpisodes(title, countStr, englishTitle, anilistId) {
         state.currentSubEps = epData.data || [];
         state.currentItaEps = epData.ita_data || [];
         state.episodeSource = 'animeunity';
-        state.audioMode = 'sub';
-
-        if (state.currentSubEps.length === 0) {
+        
+        if (state.currentSubEps.length === 0 && state.currentItaEps.length === 0) {
             grid.innerHTML = '<p>Nessun episodio trovato sul server stream.</p>';
             return;
         }
+
+        // Default to sub if available, else ita
+        state.audioMode = state.currentSubEps.length > 0 ? 'sub' : 'ita';
 
         renderEpisodeGrid();
 
@@ -369,15 +371,20 @@ function renderEpisodeGrid() {
     const grid = document.getElementById('episodesGrid');
     if (!grid) return;
     const eps = state.audioMode === 'ita' ? state.currentItaEps : state.currentSubEps;
+    const hasSub = state.currentSubEps.length > 0;
     const hasIta = state.currentItaEps.length > 0;
 
     // Inject toggle buttons under the poster
     const toggleBox = document.getElementById('audioToggleBox');
     if (toggleBox) {
-        toggleBox.innerHTML = hasIta ? `
-            <button class="audio-btn ${state.audioMode === 'sub' ? 'active' : ''}" onclick="window.switchAudioMode('sub')">&#127244; Sub ITA</button>
-            <button class="audio-btn ${state.audioMode === 'ita' ? 'active' : ''}" onclick="window.switchAudioMode('ita')">&#127470;&#127481; Doppiato</button>
-        ` : '';
+        let buttonsHtml = '';
+        if (hasSub) {
+            buttonsHtml += `<button class="audio-btn ${state.audioMode === 'sub' ? 'active' : ''}" onclick="window.switchAudioMode('sub')">&#127244; Sub ITA</button>\n`;
+        }
+        if (hasIta) {
+            buttonsHtml += `<button class="audio-btn ${state.audioMode === 'ita' ? 'active' : ''}" onclick="window.switchAudioMode('ita')">&#127470;&#127481; Doppiato</button>`;
+        }
+        toggleBox.innerHTML = buttonsHtml;
     }
 
     // Build episode buttons
