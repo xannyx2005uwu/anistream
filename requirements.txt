@@ -2,4 +2,4 @@ fastapi
 uvicorn
 httpx
 beautifulsoup4
-cloudscraper
+curl-cffi
