@@ -12,7 +12,9 @@ const state = {
     // Episode audio mode: 'sub' or 'ita'
     currentSubEps: [],
     currentItaEps: [],
-    audioMode: 'sub'
+    audioMode: 'sub',
+    currentEpNumber: null,  // episode number currently playing
+    episodeSource: 'animeunity'
 };
 
 // Router singleton
@@ -310,14 +312,14 @@ async function renderWatchPage(id) {
                 <div class="episodes-section">
                     <h2>Episodi Streaming</h2>
                     <div id="episodesGrid" class="episodes-grid">
-                         <div class="loader">Ricerca streaming su AnimeWorld in corso...</div>
+                         <div class="loader">Ricerca streaming in corso...</div>
                     </div>
                 </div>
             </div>
         `;
         
-        // Use Romaji + English title to maximise AnimeWorld search accuracy
-        fetchEpisodes(data.romajiTitle || data.name, info['Episodi'], data.englishTitle);
+        // Fetch episodes — pass AniList ID for AnimeUnity direct lookup
+        fetchEpisodes(data.romajiTitle || data.name, info['Episodi'], data.englishTitle, data.id);
         
     } catch(e) {
         console.error("Watch load failed", e);
@@ -325,10 +327,11 @@ async function renderWatchPage(id) {
     }
 }
 
-async function fetchEpisodes(title, countStr, englishTitle) {
+async function fetchEpisodes(title, countStr, englishTitle, anilistId) {
     try {
         let qs = `title=${encodeURIComponent(title)}`;
         if (englishTitle) qs += `&en=${encodeURIComponent(englishTitle)}`;
+        if (anilistId) qs += `&anilist_id=${anilistId}`;
         if (countStr && countStr !== '?' && !isNaN(countStr)) qs += `&c=${countStr}`;
 
         const res = await fetch(`/api/episodes?${qs}`);
@@ -339,6 +342,7 @@ async function fetchEpisodes(title, countStr, englishTitle) {
 
         state.currentSubEps = epData.data || [];
         state.currentItaEps = epData.ita_data || [];
+        state.episodeSource = 'animeunity';
         state.audioMode = 'sub';
 
         if (state.currentSubEps.length === 0) {
@@ -347,6 +351,12 @@ async function fetchEpisodes(title, countStr, englishTitle) {
         }
 
         renderEpisodeGrid();
+
+        // Update section heading with source badge
+        const heading = document.querySelector('.episodes-section h2');
+        if (heading) {
+            heading.innerHTML = `Episodi Streaming <span style="font-size:0.55em;background:linear-gradient(135deg,#7b2cbf,#a855f7);padding:3px 10px;border-radius:20px;margin-left:12px;vertical-align:middle;">AnimeUnity ✨</span>`;
+        }
 
     } catch(e) {
         console.error("Episode fetch failed", e);
@@ -361,46 +371,103 @@ function renderEpisodeGrid() {
     const eps = state.audioMode === 'ita' ? state.currentItaEps : state.currentSubEps;
     const hasIta = state.currentItaEps.length > 0;
 
-    // Inject toggle buttons under the poster (audioToggleBox), not in the episode grid
+    // Inject toggle buttons under the poster
     const toggleBox = document.getElementById('audioToggleBox');
     if (toggleBox) {
-        if (hasIta) {
-            toggleBox.innerHTML = `
-                <button class="audio-btn ${state.audioMode === 'sub' ? 'active' : ''}" onclick="window.switchAudioMode('sub')">&#127244; Sub ITA</button>
-                <button class="audio-btn ${state.audioMode === 'ita' ? 'active' : ''}" onclick="window.switchAudioMode('ita')">&#127470;&#127481; Doppiato</button>
-            `;
-        } else {
-            toggleBox.innerHTML = '';
-        }
+        toggleBox.innerHTML = hasIta ? `
+            <button class="audio-btn ${state.audioMode === 'sub' ? 'active' : ''}" onclick="window.switchAudioMode('sub')">&#127244; Sub ITA</button>
+            <button class="audio-btn ${state.audioMode === 'ita' ? 'active' : ''}" onclick="window.switchAudioMode('ita')">&#127470;&#127481; Doppiato</button>
+        ` : '';
     }
 
-    grid.innerHTML = eps.map(ep =>
-        `<div class="episode-btn" onclick="playEpisode('${ep.link}', this)">Ep. ${ep.number}</div>`
-    ).join('');
+    // Build episode buttons
+    grid.innerHTML = eps.map(ep => {
+        return `<div class="episode-btn" data-epnum="${ep.number}" onclick="window.playEpisode(${ep.au_id}, this)">Ep. ${ep.number}</div>`;
+    }).join('');
 }
 
-window.switchAudioMode = (mode) => {
+window.switchAudioMode = async (mode) => {
+    if (state.audioMode === mode) return;
     state.audioMode = mode;
     renderEpisodeGrid();
+
+    // Auto-replay the same episode number in the new language
+    if (state.currentEpNumber == null) return;
+    const eps = mode === 'ita' ? state.currentItaEps : state.currentSubEps;
+    if (!eps.length) return;
+
+    // Yield to let DOM update finish
+    await new Promise(r => setTimeout(r, 0));
+
+    // Find the episode with the matching number
+    const ep = eps.find(e => String(e.number) === String(state.currentEpNumber)) || eps[0];
+    // Find and highlight the button by data-epnum
+    const btn = [...document.querySelectorAll('.episode-btn')]
+        .find(el => el.dataset.epnum === String(ep.number));
+    if (!btn) return;
+    if (ep.au_id) {
+        await window.playEpisode(ep.au_id, btn);
+    }
 };
 
-window.playEpisode = (url, btnElement) => {
+// Fetch stream URL on-demand, then play via HLS.js
+window.playEpisode = async (auEpId, btnElement) => {
     document.querySelectorAll('.episode-btn').forEach(el => el.classList.remove('active'));
     btnElement.classList.add('active');
-    
+    btnElement.textContent = '⏳ Carico...';
+
     const playerBox = document.getElementById('playerBox');
-    
-    if (url.includes('.mp4')) {
-        // Usa il riproduttore nativo HTML5 per un caricamento in streaming senza forzare il download file
-        playerBox.innerHTML = `<video id="videoIframe" autoplay controls src="${url}" playsinline></video>`;
-    } else {
-        // Fallback per vecchi provider iframe (oppure ui personalizzate)
-        playerBox.innerHTML = `<iframe id="videoIframe" src="${url}" allowfullscreen></iframe>`;
-    }
-    
     playerBox.classList.add('active');
+    playerBox.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#000;color:#a855f7;font-size:1.2em">⏳ Caricamento stream...</div>`;
     playerBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    try {
+        const res = await fetch(`/api/stream?ep_id=${auEpId}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { url } = await res.json();
+        const epNum = btnElement.dataset.epnum || auEpId;
+        state.currentEpNumber = epNum;  // track for language switch
+        btnElement.textContent = `Ep. ${epNum}`;
+        btnElement.classList.add('active');
+        playHLS(url, playerBox);
+    } catch(e) {
+        console.error('Stream fetch error', e);
+        playerBox.innerHTML = `<div style="color:red;text-align:center;padding:2rem">Errore caricamento stream: ${e.message}</div>`;
+        btnElement.textContent = btnElement.textContent.replace('⏳ Carico...', 'Ep.');
+    }
 };
+
+// HLS.js player
+function playHLS(url, playerBox) {
+    playerBox.innerHTML = `<video id="videoPlayer" autoplay controls playsinline style="width:100%;height:100%;background:#000"></video>`;
+    const video = document.getElementById('videoPlayer');
+    if (!video) return;
+
+    if (typeof Hls === 'undefined') {
+        // Fallback: some browsers support HLS natively (Safari)
+        video.src = url;
+        video.play().catch(() => {});
+        return;
+    }
+
+    if (Hls.isSupported()) {
+        const hls = new Hls({ enableWorker: false, maxBufferLength: 30 });
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+        hls.on(Hls.Events.ERROR, (evt, data) => {
+            if (data.fatal) {
+                console.error('HLS fatal error', data);
+                playerBox.innerHTML = `<div style="color:red;text-align:center;padding:2rem">Errore riproduzione HLS: ${data.type}</div>`;
+            }
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        video.play().catch(() => {});
+    } else {
+        playerBox.innerHTML = `<div style="color:#a855f7;text-align:center;padding:2rem">Il tuo browser non supporta lo streaming HLS.</div>`;
+    }
+}
 
 // Start
 handleRoute();

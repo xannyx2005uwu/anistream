@@ -2,10 +2,192 @@ from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-import animeworld as aw
 import os
 import httpx
 import json
+
+# ======================== ANIMEUNITY CLIENT ========================
+from bs4 import BeautifulSoup
+import difflib
+import re
+
+AU_BASE = "https://www.animeunity.so"
+from typing import Optional
+_au_client: Optional[httpx.Client] = None
+
+def get_au_client() -> httpx.Client:
+    global _au_client
+    if _au_client is None:
+        _au_client = httpx.Client(
+            timeout=20.0,
+            follow_redirects=True,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "it-IT,it;q=0.9,en-US;q=0.8",
+                "Referer": AU_BASE,
+            }
+        )
+        try:
+            _au_client.get(AU_BASE)  # Init session / get cookies
+        except Exception:
+            pass
+    return _au_client
+
+def au_normalize(text: str) -> str:
+    """Port of the TypeScript _normalizeQuery used by AnimeUnity providers."""
+    if not text: return ""
+    s = text
+    s = re.sub(r'\b(\d+)(st|nd|rd|th)\b', r'\1', s, flags=re.IGNORECASE)  # 2nd -> 2
+    s = re.sub(r'(\d+)\s*Season', r'\1', s, flags=re.IGNORECASE)           # 2 Season -> 2
+    s = re.sub(r'Season\s*(\d+)', r'\1', s, flags=re.IGNORECASE)           # Season 2 -> 2
+    extras = r'\b(EXTRA PART|OVA|SPECIAL|RECAP|FINAL SEASON|BONUS|SIDE STORY|PART\s*\d+|EPISODE\s*\d+)\b'
+    s = re.sub(extras, '', s, flags=re.IGNORECASE)
+    s = re.sub(r'-.*?-', '', s)              # remove -...-
+    s = re.sub(r'\bThe(?=\s+Movie\b)', '', s, flags=re.IGNORECASE)
+    s = s.replace('~', ' ').replace('.', ' ')
+    s = re.sub(r'\s+', ' ', s).strip()
+    # Cut at first non-ASCII to match how AU indexes Japanese titles
+    m = re.search(r'[^\x00-\x7F]', s)
+    if m: s = s[:m.start()].strip()
+    return s.lower()
+
+def au_build_hints(title: str, english_title: str = None) -> list:
+    """Generate all keyword variants to try on AnimeUnity /archivio."""
+    candidates = []
+    for t in [title, english_title]:
+        if not t: continue
+        candidates.append(t.lower())
+        candidates.append(au_normalize(t))
+        # without 'Season' word
+        no_season = re.sub(r'\s*(\d+(st|nd|rd|th)\s*Season|Season\s*\d+)', '', t, flags=re.IGNORECASE).strip()
+        if no_season: candidates.append(no_season.lower())
+        # base before colon
+        if ':' in t:
+            candidates.append(t.split(':')[0].strip().lower())
+        # subtitle after colon
+        if ':' in t:
+            sub = t.split(':', 1)[1].strip()
+            if len(sub) > 3: candidates.append(sub.lower())
+        # first word only (if long enough)
+        first = t.split()[0]
+        if len(first) > 3: candidates.append(first.lower())
+    # Deduplicate preserving order
+    seen = set()
+    return [x for x in candidates if x and not (x in seen or seen.add(x))]
+
+def au_search(anilist_id: int, title_hints: list, is_dub: bool = False) -> Optional[dict]:
+    """Find an anime on AnimeUnity using AniList ID (perfect match, no fuzzy needed)."""
+    client = get_au_client()
+    dub_val = 1 if is_dub else 0
+
+    # Expand hints with all keyword variants
+    expanded = []
+    for h in title_hints:
+        expanded += au_build_hints(h)
+    expanded = title_hints + expanded
+    seen_q: set = set()
+    queries = [q.strip() for q in expanded if q and q.strip() not in seen_q and not seen_q.add(q.strip())]
+
+    # Collect all records seen during search for secondary title-match pass
+    all_records_by_query: dict = {}
+
+    for query in queries:
+        if not query or len(query) < 2: continue
+        try:
+            res = client.get(f"{AU_BASE}/archivio", params={"title": query}, timeout=15.0)
+            soup = BeautifulSoup(res.text, "html.parser")
+            tag = soup.find("archivio")
+            if not tag: continue
+            records = json.loads(tag.get("records", "[]"))
+            if not records: continue
+
+            all_records_by_query[query] = records
+
+            # ── Pass 1: exact AniList ID + exact dub match ──
+            dub_matches = [r for r in records if str(r.get("anilist_id")) == str(anilist_id) and r.get("dub") == dub_val]
+            if dub_matches:
+                print(f"AnimeUnity ✓ [{'dub' if is_dub else 'sub'}] anilist={anilist_id} via '{query}'")
+                return dub_matches[0]
+            # (no any_match fallback — we must respect the dub_val to avoid serving wrong audio)
+
+        except Exception as e:
+            print(f"AU search error for '{query}': {e}")
+
+    # ── Pass 2: title-based fuzzy match (catches AU/AniList ID mismatches) ──
+    # Use the primary (non-dub) title hint as the reference
+    ref_title = (title_hints[0] if title_hints else "").lower()
+    best_score = 0.0
+    best_record = None
+    for query, records in all_records_by_query.items():
+        for r in records:
+            if r.get("dub", 0) != dub_val: continue
+            for field in ["title_eng", "title", "title_it", "slug"]:
+                val = (r.get(field) or "").lower().replace("-", " ")
+                if not val: continue
+                score = difflib.SequenceMatcher(None, ref_title, val).ratio()
+                if score > best_score:
+                    best_score = score
+                    best_record = r
+    if best_record and best_score >= 0.72:
+        print(f"AnimeUnity ✓ [title-match score={best_score:.2f}] anilist={anilist_id} -> AU slug={best_record.get('slug')}")
+        return best_record
+
+    return None
+
+def au_get_episodes(au_anime_id: int) -> list:
+    """Get episode list from AnimeUnity for an anime."""
+    client = get_au_client()
+    res = client.get(f"{AU_BASE}/info_api/{au_anime_id}/0")
+    data = res.json()
+    episode_count = data.get("episodes_count", 0)
+    episodes = []
+    batch = 120
+    current = 0
+    while current < episode_count:
+        end = min(current + batch, episode_count)
+        r = client.get(f"{AU_BASE}/info_api/{au_anime_id}/0",
+                       params={"start_range": current + 1, "end_range": end})
+        batch_data = r.json()
+        for ep in batch_data.get("episodes", []):
+            episodes.append({"number": ep.get("number", current + 1), "au_id": ep["id"]})
+        current = end
+    return episodes
+
+def au_get_stream_url(episode_id: int) -> str:
+    """Fetch the live HLS stream URL for an AnimeUnity episode."""
+    client = get_au_client()
+    # Step 1: get embed URL
+    res = client.get(f"{AU_BASE}/embed-url/{episode_id}")
+    embed_url = res.text.strip().strip('"')
+    if not embed_url.startswith("http"):
+        raise Exception(f"Invalid embed URL: {embed_url!r}")
+    # Step 2: fetch embed HTML
+    res2 = client.get(embed_url, headers={"Referer": AU_BASE})
+    html = res2.text
+    # Step 3: extract masterPlaylist token/expires
+    token, expires = "", ""
+    m_master = re.search(r'window\.masterPlaylist\s*=\s*\{([\s\S]*?)\}', html)
+    if m_master:
+        m_tok = re.search(r'["\']?token["\']?\s*:\s*["\']([^"\' ]+)["\']', m_master.group(1))
+        m_exp = re.search(r'["\']?expires["\']?\s*:\s*["\']([^"\' ]+)["\']', m_master.group(1))
+        if m_tok: token = m_tok.group(1)
+        if m_exp: expires = m_exp.group(1)
+    # Step 4: extract streams
+    m_streams = re.search(r'window\.streams\s*=\s*(\[[\s\S]*?\]);', html)
+    if not m_streams:
+        raise Exception("streams not found in embed HTML")
+    streams_raw = m_streams.group(1).replace("\\u0026", "&").replace("\\u003d", "=")
+    streams = json.loads(streams_raw)
+    # Prefer Server1, fallback to first
+    stream = next((s for s in streams if s.get("name") == "Server1"), streams[0] if streams else None)
+    if not stream:
+        raise Exception("No streams available")
+    playlist_url = stream["url"].replace("\u0026", "&").replace("\u003d", "=")
+    final = f"{playlist_url}&token={token}&expires={expires}&h=1"
+    print(f"Stream URL: {final[:80]}...")
+    return final
+
 
 app = FastAPI(title="Anistream API")
 
@@ -160,6 +342,7 @@ def get_anime_details(id: int = Query(..., description="The Anilist ID")):
             })
 
     return {
+        "id": id,
         "name": title,
         "romajiTitle": media.get("title", {}).get("romaji"),
         "englishTitle": media.get("title", {}).get("english"),
@@ -178,129 +361,50 @@ def get_anime_details(id: int = Query(..., description="The Anilist ID")):
 import difflib
 import re
 
-def get_aw_animelink(title: str, english_title: str = None):
-    import urllib.parse
-    from bs4 import BeautifulSoup
-
-    # Score against romaji AND english title, take the best
-    def match_score(found_name):
-        s = difflib.SequenceMatcher(None, title.lower(), found_name.lower()).ratio()
-        if english_title:
-            s2 = difflib.SequenceMatcher(None, english_title.lower(), found_name.lower()).ratio()
-            s = max(s, s2)
-        return s
-
-    # Build progressive keyword candidates from most specific to least
-    search_keywords = []
-    search_keywords.append(title)
-    if english_title and english_title.lower() != title.lower():
-        search_keywords.append(english_title)
-    # Romaji without season suffix
-    clean_rom = re.sub(r'\s*(\d+(st|nd|rd|th) Season|Season \d+|Part \d+)$', '', title, flags=re.IGNORECASE).strip()
-    if clean_rom and clean_rom not in search_keywords:
-        search_keywords.append(clean_rom)
-    # Romaji base (before colon)
-    if ":" in title:
-        base = title.split(":")[0].strip()
-        if base not in search_keywords:
-            search_keywords.append(base)
-    # English base (before colon) — key for "Frieren: Beyond..." -> "Frieren"
-    if english_title and ":" in english_title:
-        base_en = english_title.split(":")[0].strip()
-        if base_en not in search_keywords:
-            search_keywords.append(base_en)
-    # First meaningful word of English title as last resort
-    if english_title:
-        first_word = english_title.split()[0]
-        if len(first_word) > 4 and first_word not in search_keywords:
-            search_keywords.append(first_word)
-
-    best_link = None
-    best_score = -1
-
-    for keyword in search_keywords:
-        try:
-            results = aw.find(keyword)
-            if results:
-                for r in results:
-                    score = match_score(r.get("name", ""))
-                    if score > best_score:
-                        best_score = score
-                        best_link = r["link"]
-                if best_score > 0.65:
-                    print(f"Found via aw.find! keyword='{keyword}', score={best_score:.2f}")
-                    return best_link
-        except Exception:
-            pass
-
-        try:
-            with httpx.Client(timeout=10.0, follow_redirects=True) as client:
-                res = client.get(
-                    f"https://www.animeworld.ac/filter?keyword={urllib.parse.quote(keyword)}",
-                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-                )
-                soup = BeautifulSoup(res.text, "html.parser")
-                items = soup.select(".film-list .item a.name")
-                for item in items:
-                    name_found = item.get_text(strip=True)
-                    score = match_score(name_found)
-                    if score > best_score:
-                        best_score = score
-                        best_link = "https://www.animeworld.ac" + item["href"]
-                if best_score > 0.65:
-                    print(f"Found via HTML scrape! keyword='{keyword}', score={best_score:.2f}")
-                    return best_link
-        except Exception:
-            pass
-
-    if best_score > 0.65:
-        return best_link
-    return None
+@app.get("/api/stream")
+def get_episode_stream(ep_id: int = Query(..., description="AnimeUnity episode ID")):
+    """Fetch the live HLS stream URL for an AnimeUnity episode (called on demand when user clicks)."""
+    try:
+        url = au_get_stream_url(ep_id)
+        return {"url": url}
+    except Exception as e:
+        print("Stream fetch error:", e)
+        raise HTTPException(status_code=502, detail=f"Could not fetch stream: {e}")
 
 @app.get("/api/episodes")
 def get_anime_episodes(
     title: str = Query(..., description="The anime romaji title"),
     en: str = Query(None, description="The anime English title (fallback)"),
+    anilist_id: int = Query(None, description="AniList anime ID"),
     c: int = Query(None, description="Total episodes count from anilist")
 ):
-    def build_eps(link):
-        anime = aw.Anime(link)
-        result = []
-        for ep in anime.getEpisodes():
-            raw_url = getattr(ep.links[0], 'link', '') if len(ep.links) > 0 else ''
-            if "download-file.php?id=" in raw_url:
-                raw_url = raw_url.replace("download-file.php?id=", "")
-            result.append({"number": ep.number, "link": raw_url})
-        return result
-
-    try:
-        if not title or title.strip() == "None": raise Exception("Invalid title")
-        aw_link = get_aw_animelink(title, english_title=en)
-        if not aw_link:
-            raise Exception("Cannot find anime in AnimeWorld via title search")
-
-        eps_data = build_eps(aw_link)
-        if not eps_data: raise Exception("No episodes found")
-
-        # Search for Italian Dub (ITA) version
-        ita_data = []
+    # ── 1. Try AnimeUnity first (exact AniList ID match, no fuzzy nonsense) ──
+    if anilist_id:
         try:
-            ita_link = get_aw_animelink(title + " (ITA)", english_title=(en + " (ITA)") if en else None)
-            if ita_link and ita_link != aw_link:
-                ita_data = build_eps(ita_link)
-        except Exception as ita_err:
-            print("ITA search failed:", ita_err)
+            hints = au_build_hints(title, en)
+            au_sub = au_search(anilist_id, hints, is_dub=False)
+            if au_sub:
+                eps_data = au_get_episodes(au_sub["id"])
+                ita_data = []
+                try:
+                    au_dub = au_search(anilist_id, hints, is_dub=True)
+                    if au_dub:
+                        ita_data = au_get_episodes(au_dub["id"])
+                except Exception as dub_e:
+                    print("AU dub search failed:", dub_e)
+                if eps_data:
+                    return {"data": eps_data, "ita_data": ita_data, "source": "animeunity"}
+        except Exception as au_e:
+            print("AnimeUnity failed, falling back to AnimeWorld:", au_e)
 
-        return {"data": eps_data, "ita_data": ita_data}
+    # If AnimeUnity fails, return empty
+    target_c = c if c is not None else 1
+    max_eps = max(1, min(target_c, 5000))
+    html_content = "<html><body style='background:#111;color:#a855f7;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;text-align:center'><h2>Episodio in Arrivo / Stream Non Trovato</h2></body></html>"
+    import urllib.parse
+    data_uri = "data:text/html;charset=utf-8," + urllib.parse.quote(html_content)
+    return {"data": [{"number": str(i+1), "link": data_uri} for i in range(max_eps)], "ita_data": [], "source": "fallback"}
 
-    except Exception as e:
-        print("Fallback episodes:", e)
-        target_c = c if c is not None else 1
-        max_eps = max(1, min(target_c, 5000))
-        html_content = "<html><body style='background:#111;color:#a855f7;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;text-align:center'><h2>Episodio in Arrivo / Stream Non Trovato</h2></body></html>"
-        import urllib.parse
-        data_uri = "data:text/html;charset=utf-8," + urllib.parse.quote(html_content)
-        return {"data": [{"number": str(i+1), "link": data_uri} for i in range(max_eps)], "ita_data": []}
 
 # Serve the static files (Frontend code)
 static_dir = os.path.join(os.path.dirname(__file__), "static")
