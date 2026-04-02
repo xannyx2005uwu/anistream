@@ -1,12 +1,8 @@
-import os
-import animeworld as aw
-
-print("Trying aw.find...")
+import httpx
 try:
-    print(aw.find("naruto"))
+    with httpx.Client(timeout=10.0, follow_redirects=True) as client:
+        r = client.get("https://www.animeworld.so/api/search/v2", params={"keyword": "naruto"}, headers={"User-Agent": "Mozilla/5.0"})
+        print(f"Status: {r.status_code}")
+        print(f"JSON keys: {r.json().keys() if r.status_code == 200 else r.text[:100]}")
 except Exception as e:
-    print("Exception", e)
-    res = aw.SES.post("/api/search/v2?", params={"keyword": "naruto"}, follow_redirects=True)
-    print("STATUS", res.status_code)
-    print("HEADERS", res.headers)
-    print("CONTENT", res.text[:500])
+    print(f"Error: {e}")

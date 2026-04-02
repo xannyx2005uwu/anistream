@@ -12,46 +12,42 @@ import difflib
 import re
 
 AU_BASE = "https://www.animeunity.so"
-from typing import Optional
-_au_client: Optional[httpx.Client] = None
+import cloudscraper
+_au_client = None
 
-def get_au_client() -> httpx.Client:
+def get_au_client():
     global _au_client
     if _au_client is None:
-        _au_client = httpx.Client(
-            timeout=15.0,
-            follow_redirects=True,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "it-IT,it;q=0.9,en-US;q=0.8",
-                "Referer": AU_BASE,
+        _au_client = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'desktop': True
             }
         )
         try:
-            _au_client.get(AU_BASE)  # Init session / get cookies
+            _au_client.get(AU_BASE, timeout=15.0)  # Init session / get cookies
         except Exception:
             pass
     return _au_client
 
 import urllib.parse
-def au_get(url: str, params: dict = None, timeout: float = 15.0, headers: dict = None) -> httpx.Response:
+def au_get(url: str, params: dict = None, timeout: float = 15.0, headers: dict = None):
     client = get_au_client()
     try:
-        # Tenta connessione diretta
+        # Tenta connessione usando cloudscraper (aggira Cloudflare nativamente)
         res = client.get(url, params=params, headers=headers, timeout=timeout)
         if res.status_code in [403, 503, 429]:
-            raise Exception("Cloudflare blocked")
+            raise Exception(f"Cloudflare blocked cloudscraper ({res.status_code})")
         return res
     except Exception as e:
-        print(f"Direct connection failed: {e}. Trying proxy...")
-        # Usa un proxy pubblico per aggirare Cloudflare su Vercel (se bloccato)
+        print(f"Cloudscraper failed: {e}. Trying proxy...")
         if params:
             qs = urllib.parse.urlencode(params)
             full_url = f"{url}?{qs}"
         else:
             full_url = url
-        proxy_url = f"https://api.codetabs.com/v1/proxy?quest={full_url}"
+        proxy_url = f"https://api.codetabs.com/v1/proxy?quest={urllib.parse.quote(full_url)}"
         return client.get(proxy_url, headers=headers, timeout=timeout + 5.0)
 
 def au_normalize(text: str) -> str:
