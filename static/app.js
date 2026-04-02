@@ -419,6 +419,11 @@ window.switchAudioMode = async (mode) => {
 
 // Fetch stream URL on-demand, then play via HLS.js
 window.playEpisode = async (auEpId, btnElement) => {
+    if (!auEpId || auEpId === 'undefined') {
+        alert("Questo episodio non ha uno stream valido associato. Riprova più tardi.");
+        return;
+    }
+
     document.querySelectorAll('.episode-btn').forEach(el => el.classList.remove('active'));
     btnElement.classList.add('active');
     btnElement.textContent = '⏳ Carico...';

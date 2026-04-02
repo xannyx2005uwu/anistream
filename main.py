@@ -19,7 +19,7 @@ def get_au_client() -> httpx.Client:
     global _au_client
     if _au_client is None:
         _au_client = httpx.Client(
-            timeout=20.0,
+            timeout=4.0,
             follow_redirects=True,
             headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -99,7 +99,11 @@ def au_search_both(anilist_id: int, title_hints: list) -> tuple[Optional[dict], 
         if sub_record and dub_record: break # found both
 
         try:
-            res = client.get(f"{AU_BASE}/archivio", params={"title": query}, timeout=10.0)
+            res = client.get(f"{AU_BASE}/archivio", params={"title": query}, timeout=4.0)
+            if res.status_code in [403, 429, 503]:
+                print(f"AU Blocked by Cloudflare! Status: {res.status_code}")
+                break
+                
             soup = BeautifulSoup(res.text, "html.parser")
             tag = soup.find("archivio")
             if not tag: continue
