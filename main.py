@@ -74,12 +74,11 @@ def au_build_hints(title: str, english_title: str = None) -> list:
         if len(first) > 3: candidates.append(first.lower())
     # Deduplicate preserving order
     seen = set()
-    return [x for x in candidates if x and not (x in seen or seen.add(x))]
+    return [x for x in candidates if x and not (x in seen or seen.add(x))][:3]
 
-def au_search(anilist_id: int, title_hints: list, is_dub: bool = False) -> Optional[dict]:
-    """Find an anime on AnimeUnity using AniList ID (perfect match, no fuzzy needed)."""
+def au_search_both(anilist_id: int, title_hints: list) -> tuple[Optional[dict], Optional[dict]]:
+    """Find both sub and dub on AnimeUnity using AniList ID."""
     client = get_au_client()
-    dub_val = 1 if is_dub else 0
 
     # Expand hints with all keyword variants
     expanded = []
@@ -91,11 +90,16 @@ def au_search(anilist_id: int, title_hints: list, is_dub: bool = False) -> Optio
 
     # Collect all records seen during search for secondary title-match pass
     all_records_by_query: dict = {}
+    
+    sub_record = None
+    dub_record = None
 
     for query in queries:
         if not query or len(query) < 2: continue
+        if sub_record and dub_record: break # found both
+
         try:
-            res = client.get(f"{AU_BASE}/archivio", params={"title": query}, timeout=15.0)
+            res = client.get(f"{AU_BASE}/archivio", params={"title": query}, timeout=10.0)
             soup = BeautifulSoup(res.text, "html.parser")
             tag = soup.find("archivio")
             if not tag: continue
@@ -104,36 +108,50 @@ def au_search(anilist_id: int, title_hints: list, is_dub: bool = False) -> Optio
 
             all_records_by_query[query] = records
 
-            # ── Pass 1: exact AniList ID + exact dub match ──
-            dub_matches = [r for r in records if str(r.get("anilist_id")) == str(anilist_id) and r.get("dub") == dub_val]
-            if dub_matches:
-                print(f"AnimeUnity ✓ [{'dub' if is_dub else 'sub'}] anilist={anilist_id} via '{query}'")
-                return dub_matches[0]
-            # (no any_match fallback — we must respect the dub_val to avoid serving wrong audio)
+            # ── Pass 1: exact AniList ID ──
+            if not sub_record:
+                matches = [r for r in records if str(r.get("anilist_id")) == str(anilist_id) and r.get("dub") == 0]
+                if matches:
+                    print(f"AnimeUnity ✓ [sub] anilist={anilist_id} via '{query}'")
+                    sub_record = matches[0]
+            
+            if not dub_record:
+                matches = [r for r in records if str(r.get("anilist_id")) == str(anilist_id) and r.get("dub") == 1]
+                if matches:
+                    print(f"AnimeUnity ✓ [dub] anilist={anilist_id} via '{query}'")
+                    dub_record = matches[0]
 
         except Exception as e:
             print(f"AU search error for '{query}': {e}")
+            if "Timeout" in str(e) or "429" in str(e) or "403" in str(e):
+                break
 
     # ── Pass 2: title-based fuzzy match (catches AU/AniList ID mismatches) ──
-    # Use the primary (non-dub) title hint as the reference
     ref_title = (title_hints[0] if title_hints else "").lower()
-    best_score = 0.0
-    best_record = None
-    for query, records in all_records_by_query.items():
-        for r in records:
-            if r.get("dub", 0) != dub_val: continue
-            for field in ["title_eng", "title", "title_it", "slug"]:
-                val = (r.get(field) or "").lower().replace("-", " ")
-                if not val: continue
-                score = difflib.SequenceMatcher(None, ref_title, val).ratio()
-                if score > best_score:
-                    best_score = score
-                    best_record = r
-    if best_record and best_score >= 0.72:
-        print(f"AnimeUnity ✓ [title-match score={best_score:.2f}] anilist={anilist_id} -> AU slug={best_record.get('slug')}")
-        return best_record
+    
+    def fuzzy_match(want_dub: bool):
+        dub_val = 1 if want_dub else 0
+        best_score = 0.0
+        best_r = None
+        for query, records in all_records_by_query.items():
+            for r in records:
+                if r.get("dub", 0) != dub_val: continue
+                for field in ["title_eng", "title", "title_it", "slug"]:
+                    val = (r.get(field) or "").lower().replace("-", " ")
+                    if not val: continue
+                    score = difflib.SequenceMatcher(None, ref_title, val).ratio()
+                    if score > best_score:
+                        best_score = score
+                        best_r = r
+        if best_r and best_score >= 0.72:
+            print(f"AnimeUnity ✓ [title-match score={best_score:.2f}] anilist={anilist_id} -> AU slug={best_r.get('slug')}")
+            return best_r
+        return None
 
-    return None
+    if not sub_record: sub_record = fuzzy_match(False)
+    if not dub_record: dub_record = fuzzy_match(True)
+
+    return sub_record, dub_record
 
 def au_get_episodes(au_anime_id: int) -> list:
     """Get episode list from AnimeUnity for an anime."""
@@ -382,18 +400,23 @@ def get_anime_episodes(
     if anilist_id:
         try:
             hints = au_build_hints(title, en)
-            au_sub = au_search(anilist_id, hints, is_dub=False)
+            au_sub, au_dub = au_search_both(anilist_id, hints)
+            
+            eps_data = []
+            ita_data = []
+            
             if au_sub:
                 eps_data = au_get_episodes(au_sub["id"])
-                ita_data = []
+                
+            if au_dub:
                 try:
-                    au_dub = au_search(anilist_id, hints, is_dub=True)
-                    if au_dub:
-                        ita_data = au_get_episodes(au_dub["id"])
+                    ita_data = au_get_episodes(au_dub["id"])
                 except Exception as dub_e:
-                    print("AU dub search failed:", dub_e)
-                if eps_data:
-                    return {"data": eps_data, "ita_data": ita_data, "source": "animeunity"}
+                    print("AU dub episode fetch failed:", dub_e)
+                    
+            if eps_data or ita_data:
+                return {"data": eps_data, "ita_data": ita_data, "source": "animeunity"}
+                
         except Exception as au_e:
             print("AnimeUnity failed, falling back to AnimeWorld:", au_e)
 
