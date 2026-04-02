@@ -5,26 +5,18 @@ from fastapi.responses import FileResponse
 import os
 import httpx
 import json
-
-# ======================== ANIMEUNITY CLIENT ========================
 from bs4 import BeautifulSoup
 import difflib
 import re
-
 AU_BASE = "https://www.animeunity.so"
-import cloudscraper
+
+from curl_cffi import requests as cffi_requests
 _au_client = None
 
 def get_au_client():
     global _au_client
     if _au_client is None:
-        _au_client = cloudscraper.create_scraper(
-            browser={
-                'browser': 'chrome',
-                'platform': 'windows',
-                'desktop': True
-            }
-        )
+        _au_client = cffi_requests.Session(impersonate="chrome110")
         try:
             _au_client.get(AU_BASE, timeout=15.0)  # Init session / get cookies
         except Exception:
@@ -35,13 +27,13 @@ import urllib.parse
 def au_get(url: str, params: dict = None, timeout: float = 15.0, headers: dict = None):
     client = get_au_client()
     try:
-        # Tenta connessione usando cloudscraper (aggira Cloudflare nativamente)
+        # Tenta connessione impersonificando Chrome per aggirare Cloudflare senza runtime JS esterno
         res = client.get(url, params=params, headers=headers, timeout=timeout)
-        if res.status_code in [403, 503, 429]:
-            raise Exception(f"Cloudflare blocked cloudscraper ({res.status_code})")
+        if res.status_code in [403, 503, 429] and "cloudflare" in res.text.lower():
+            raise Exception(f"Cloudflare blocked curl-cffi ({res.status_code})")
         return res
     except Exception as e:
-        print(f"Cloudscraper failed: {e}. Trying proxy...")
+        print(f"curl-cffi failed: {e}. Trying proxy...")
         if params:
             qs = urllib.parse.urlencode(params)
             full_url = f"{url}?{qs}"
