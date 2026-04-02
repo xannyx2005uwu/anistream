@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, HTTPException, Query, Response, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 import os
 import httpx
 import json
@@ -442,9 +442,25 @@ if not os.path.exists(static_dir):
 
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+@app.post("/do-login")
+async def do_login(username: str = Form(...), password: str = Form(...)):
+    if username == "bircala" and password == "ciao123":
+        res = RedirectResponse(url="/", status_code=303)
+        res.set_cookie(key="auth_token", value="secret_bircala_ciao123", max_age=86400*30, httponly=True)
+        return res
+    return RedirectResponse(url="/login.html?error=1", status_code=303)
+
 @app.get("/{full_path:path}")
-def catch_all(full_path: str):
+def catch_all(full_path: str, request: Request):
+    is_root = full_path == "" or full_path == "index.html"
+    is_protected_spa = not full_path.startswith("api/") and not full_path.endswith(".css") and not full_path.endswith(".js") and full_path != "login.html"
+    
+    if (is_root or is_protected_spa):
+        if request.cookies.get("auth_token") != "secret_bircala_ciao123":
+            return RedirectResponse(url="/login.html", status_code=303)
+            
     target_path = os.path.join(static_dir, full_path)
     if os.path.isfile(target_path):
         return FileResponse(target_path)
+        
     return FileResponse(os.path.join(static_dir, "index.html"))
