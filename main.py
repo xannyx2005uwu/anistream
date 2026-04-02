@@ -19,7 +19,7 @@ def get_au_client() -> httpx.Client:
     global _au_client
     if _au_client is None:
         _au_client = httpx.Client(
-            timeout=4.0,
+            timeout=15.0,
             follow_redirects=True,
             headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -33,6 +33,26 @@ def get_au_client() -> httpx.Client:
         except Exception:
             pass
     return _au_client
+
+import urllib.parse
+def au_get(url: str, params: dict = None, timeout: float = 15.0, headers: dict = None) -> httpx.Response:
+    client = get_au_client()
+    try:
+        # Tenta connessione diretta
+        res = client.get(url, params=params, headers=headers, timeout=timeout)
+        if res.status_code in [403, 503, 429]:
+            raise Exception("Cloudflare blocked")
+        return res
+    except Exception as e:
+        print(f"Direct connection failed: {e}. Trying proxy...")
+        # Usa un proxy pubblico per aggirare Cloudflare su Vercel (se bloccato)
+        if params:
+            qs = urllib.parse.urlencode(params)
+            full_url = f"{url}?{qs}"
+        else:
+            full_url = url
+        proxy_url = f"https://api.codetabs.com/v1/proxy?quest={full_url}"
+        return client.get(proxy_url, headers=headers, timeout=timeout + 5.0)
 
 def au_normalize(text: str) -> str:
     """Port of the TypeScript _normalizeQuery used by AnimeUnity providers."""
@@ -99,11 +119,7 @@ def au_search_both(anilist_id: int, title_hints: list) -> tuple[Optional[dict], 
         if sub_record and dub_record: break # found both
 
         try:
-            res = client.get(f"{AU_BASE}/archivio", params={"title": query}, timeout=4.0)
-            if res.status_code in [403, 429, 503]:
-                print(f"AU Blocked by Cloudflare! Status: {res.status_code}")
-                break
-                
+            res = au_get(f"{AU_BASE}/archivio", params={"title": query}, timeout=10.0)
             soup = BeautifulSoup(res.text, "html.parser")
             tag = soup.find("archivio")
             if not tag: continue
@@ -159,8 +175,7 @@ def au_search_both(anilist_id: int, title_hints: list) -> tuple[Optional[dict], 
 
 def au_get_episodes(au_anime_id: int) -> list:
     """Get episode list from AnimeUnity for an anime."""
-    client = get_au_client()
-    res = client.get(f"{AU_BASE}/info_api/{au_anime_id}/0")
+    res = au_get(f"{AU_BASE}/info_api/{au_anime_id}/0")
     data = res.json()
     episode_count = data.get("episodes_count", 0)
     episodes = []
@@ -168,7 +183,7 @@ def au_get_episodes(au_anime_id: int) -> list:
     current = 0
     while current < episode_count:
         end = min(current + batch, episode_count)
-        r = client.get(f"{AU_BASE}/info_api/{au_anime_id}/0",
+        r = au_get(f"{AU_BASE}/info_api/{au_anime_id}/0",
                        params={"start_range": current + 1, "end_range": end})
         batch_data = r.json()
         for ep in batch_data.get("episodes", []):
@@ -178,14 +193,13 @@ def au_get_episodes(au_anime_id: int) -> list:
 
 def au_get_stream_url(episode_id: int) -> str:
     """Fetch the live HLS stream URL for an AnimeUnity episode."""
-    client = get_au_client()
     # Step 1: get embed URL
-    res = client.get(f"{AU_BASE}/embed-url/{episode_id}")
+    res = au_get(f"{AU_BASE}/embed-url/{episode_id}")
     embed_url = res.text.strip().strip('"')
     if not embed_url.startswith("http"):
         raise Exception(f"Invalid embed URL: {embed_url!r}")
     # Step 2: fetch embed HTML
-    res2 = client.get(embed_url, headers={"Referer": AU_BASE})
+    res2 = au_get(embed_url, headers={"Referer": AU_BASE})
     html = res2.text
     # Step 3: extract masterPlaylist token/expires
     token, expires = "", ""

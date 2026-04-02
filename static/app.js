@@ -389,7 +389,10 @@ function renderEpisodeGrid() {
 
     // Build episode buttons
     grid.innerHTML = eps.map(ep => {
-        return `<div class="episode-btn" data-epnum="${ep.number}" onclick="window.playEpisode(${ep.au_id}, this)">Ep. ${ep.number}</div>`;
+        const hasAuId = ep.au_id !== undefined;
+        const auParam = hasAuId ? ep.au_id : 'undefined';
+        const linkAttr = ep.link ? `data-link="${ep.link}"` : '';
+        return `<div class="episode-btn" data-epnum="${ep.number}" ${linkAttr} onclick="window.playEpisode(${auParam}, this)">Ep. ${ep.number}</div>`;
     }).join('');
 }
 
@@ -419,17 +422,27 @@ window.switchAudioMode = async (mode) => {
 
 // Fetch stream URL on-demand, then play via HLS.js
 window.playEpisode = async (auEpId, btnElement) => {
-    if (!auEpId || auEpId === 'undefined') {
-        alert("Questo episodio non ha uno stream valido associato. Riprova più tardi.");
-        return;
-    }
-
     document.querySelectorAll('.episode-btn').forEach(el => el.classList.remove('active'));
     btnElement.classList.add('active');
     btnElement.textContent = '⏳ Carico...';
 
     const playerBox = document.getElementById('playerBox');
     playerBox.classList.add('active');
+    
+    // Check if it's a fallback episode (no au_id)
+    if (!auEpId || auEpId === 'undefined') {
+        const linkStr = btnElement.getAttribute('data-link');
+        if (linkStr) {
+            playerBox.innerHTML = `<iframe src="${linkStr}" allowfullscreen style="width:100%;height:100%;background:#000;border:none;"></iframe>`;
+            playerBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            btnElement.textContent = `Ep. ${btnElement.dataset.epnum || '?'}`;
+        } else {
+            playerBox.innerHTML = `<div style="color:red;text-align:center;padding:2rem">Errore: Stream non trovato.</div>`;
+            btnElement.textContent = `Ep. X`;
+        }
+        return;
+    }
+
     playerBox.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#000;color:#a855f7;font-size:1.2em">⏳ Caricamento stream...</div>`;
     playerBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
@@ -445,7 +458,7 @@ window.playEpisode = async (auEpId, btnElement) => {
     } catch(e) {
         console.error('Stream fetch error', e);
         playerBox.innerHTML = `<div style="color:red;text-align:center;padding:2rem">Errore caricamento stream: ${e.message}</div>`;
-        btnElement.textContent = btnElement.textContent.replace('⏳ Carico...', 'Ep.');
+        btnElement.textContent = btnElement.textContent.replace('⏳ Carico...', 'Ep. ');
     }
 };
 
