@@ -27,7 +27,7 @@ import urllib.parse
 def au_get(url: str, params: dict = None, timeout: float = 15.0, headers: dict = None):
     client = get_au_client()
     try:
-        # Tenta connessione impersonificando Chrome per aggirare Cloudflare senza runtime JS esterno
+        # Tenta connessione impersonificando Chrome per aggirare Cloudflare in nativo
         res = client.get(url, params=params, headers=headers, timeout=timeout)
         if res.status_code in [403, 503, 429] and "cloudflare" in res.text.lower():
             raise Exception(f"Cloudflare blocked curl-cffi ({res.status_code})")
