@@ -420,7 +420,33 @@ window.switchAudioMode = async (mode) => {
     }
 };
 
-// Fetch stream URL on-demand, then play via HLS.js
+window.streamCache = window.streamCache || {};
+
+window.prefetchNextStream = async (btnElement) => {
+    try {
+        const nextBtn = btnElement.nextElementSibling;
+        if (!nextBtn || !nextBtn.classList.contains('episode-btn')) return;
+        const onclickAttr = nextBtn.getAttribute('onclick');
+        if (!onclickAttr) return;
+        
+        // Extract the auEpId passed to window.playEpisode
+        const match = onclickAttr.match(/playEpisode\(([^,]+)/);
+        if (match && match[1]) {
+            const nextAuId = match[1].trim();
+            if (nextAuId && nextAuId !== 'undefined' && !window.streamCache[nextAuId]) {
+                const res = await fetch(`/api/stream?ep_id=${nextAuId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    window.streamCache[nextAuId] = data.url;
+                }
+            }
+        }
+    } catch(e) {
+        console.log("Prefetch failed quietly", e);
+    }
+};
+
+// Fetch stream URL on-demand (with cache/prefetching), then play via HLS.js
 window.playEpisode = async (auEpId, btnElement) => {
     document.querySelectorAll('.episode-btn').forEach(el => el.classList.remove('active'));
     btnElement.classList.add('active');
@@ -447,14 +473,23 @@ window.playEpisode = async (auEpId, btnElement) => {
     playerBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     try {
-        const res = await fetch(`/api/stream?ep_id=${auEpId}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const { url } = await res.json();
+        let url = window.streamCache[auEpId];
+        if (!url) {
+            const res = await fetch(`/api/stream?ep_id=${auEpId}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            url = data.url;
+            window.streamCache[auEpId] = url;
+        }
+
         const epNum = btnElement.dataset.epnum || auEpId;
         state.currentEpNumber = epNum;  // track for language switch
         btnElement.textContent = `Ep. ${epNum}`;
         btnElement.classList.add('active');
         playHLS(url, playerBox);
+
+        // Pre-carica l'episodio successivo per abbattere i tempi di buffering futuri
+        window.prefetchNextStream(btnElement);
     } catch(e) {
         console.error('Stream fetch error', e);
         playerBox.innerHTML = `<div style="color:red;text-align:center;padding:2rem">Errore caricamento stream: ${e.message}</div>`;
