@@ -385,6 +385,8 @@ def get_anime_details(id: int = Query(..., description="The Anilist ID")):
 
 import difflib
 import re
+import urllib.parse
+from fastapi.responses import StreamingResponse
 
 VIXCLOUD_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -398,23 +400,36 @@ def proxy_url(original_url: str) -> str:
     return f"/api/proxy?url={urllib.parse.quote(original_url, safe='')}"
 
 def rewrite_m3u8(content: str, base_url: str) -> str:
-    """Rewrite all URLs inside an m3u8 playlist to go through our proxy."""
-    import urllib.parse
+    """Rewrite ALL URLs inside an m3u8 playlist to go through our proxy.
+    Handles: segment lines, #EXT-X-KEY URIs, #EXT-X-MAP URIs."""
     lines = content.splitlines()
     out = []
     base = base_url.rsplit("/", 1)[0] + "/"
+
+    def make_absolute(u: str) -> str:
+        if u.startswith("http"):
+            return u
+        return urllib.parse.urljoin(base, u)
+
+    def rewrite_tag_uris(tag_line: str) -> str:
+        """Rewrite URI=\"...\" values inside a tag line."""
+        def replace_uri(m):
+            raw = m.group(1)
+            abs_u = make_absolute(raw)
+            return f'URI="{proxy_url(abs_u)}"'
+        return re.sub(r'URI="([^"]+)"', replace_uri, tag_line)
+
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith("#"):
+        if stripped == "":
             out.append(line)
-        elif stripped == "":
+        elif stripped.startswith("#EXT-X-KEY") or stripped.startswith("#EXT-X-MAP"):
+            # These tags can contain URI= that need proxying (e.g. AES-128 key URL)
+            out.append(rewrite_tag_uris(stripped))
+        elif stripped.startswith("#"):
             out.append(line)
         else:
-            # Make absolute if relative
-            if stripped.startswith("http"):
-                abs_url = stripped
-            else:
-                abs_url = urllib.parse.urljoin(base, stripped)
+            abs_url = make_absolute(stripped)
             out.append(proxy_url(abs_url))
     return "\n".join(out)
 
@@ -431,14 +446,16 @@ def get_episode_stream(ep_id: int = Query(..., description="AnimeUnity episode I
 
 @app.get("/api/proxy")
 def hls_proxy(url: str = Query(..., description="Absolute vixcloud URL to proxy")):
-    """Transparent HLS proxy: fetches vixcloud content server-side with correct headers."""
-    import urllib.parse
+    """Transparent HLS proxy: fetches vixcloud content server-side with correct Referer."""
     try:
-        with httpx.Client(timeout=20.0, follow_redirects=True) as client:
+        # Use a longer timeout for binary segments
+        with httpx.Client(timeout=60.0, follow_redirects=True) as client:
             r = client.get(url, headers=VIXCLOUD_HEADERS)
-            r.raise_for_status()
+            if r.status_code >= 400:
+                raise HTTPException(status_code=r.status_code, detail=f"Upstream error {r.status_code}")
             content_type = r.headers.get("content-type", "application/octet-stream")
-            # If it's an m3u8 playlist, rewrite internal URLs
+
+            # m3u8 playlist — rewrite internal URLs including #EXT-X-KEY
             if "mpegurl" in content_type or url.split("?")[0].endswith(".m3u8"):
                 body = rewrite_m3u8(r.text, url)
                 return Response(
@@ -449,12 +466,18 @@ def hls_proxy(url: str = Query(..., description="Absolute vixcloud URL to proxy"
                         "Cache-Control": "no-cache",
                     }
                 )
-            # Binary segment (ts / aac / key)
+
+            # AES-128 key or binary segment — stream directly
             return Response(
                 content=r.content,
                 media_type=content_type,
-                headers={"Access-Control-Allow-Origin": "*"},
+                headers={
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Length": str(len(r.content)),
+                },
             )
+    except HTTPException:
+        raise
     except Exception as e:
         print("Proxy error:", url[:80], e)
         raise HTTPException(status_code=502, detail=f"Proxy error: {e}")
