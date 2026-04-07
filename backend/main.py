@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Query, Response, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
+from typing import Optional
 import os
 import httpx
 import json
@@ -385,15 +386,78 @@ def get_anime_details(id: int = Query(..., description="The Anilist ID")):
 import difflib
 import re
 
+VIXCLOUD_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Referer": "https://animeunity.so",
+    "Origin": "https://animeunity.so",
+}
+
+def proxy_url(original_url: str) -> str:
+    """Encode a vixcloud URL into a local /api/proxy path."""
+    import urllib.parse
+    return f"/api/proxy?url={urllib.parse.quote(original_url, safe='')}"
+
+def rewrite_m3u8(content: str, base_url: str) -> str:
+    """Rewrite all URLs inside an m3u8 playlist to go through our proxy."""
+    import urllib.parse
+    lines = content.splitlines()
+    out = []
+    base = base_url.rsplit("/", 1)[0] + "/"
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            out.append(line)
+        elif stripped == "":
+            out.append(line)
+        else:
+            # Make absolute if relative
+            if stripped.startswith("http"):
+                abs_url = stripped
+            else:
+                abs_url = urllib.parse.urljoin(base, stripped)
+            out.append(proxy_url(abs_url))
+    return "\n".join(out)
+
 @app.get("/api/stream")
 def get_episode_stream(ep_id: int = Query(..., description="AnimeUnity episode ID")):
-    """Fetch the live HLS stream URL for an AnimeUnity episode (called on demand when user clicks)."""
+    """Fetch the live HLS stream URL (proxied) for an AnimeUnity episode."""
     try:
-        url = au_get_stream_url(ep_id)
-        return {"url": url}
+        vix_url = au_get_stream_url(ep_id)
+        # Return the proxied URL directly — frontend points HLS.js here
+        return {"url": proxy_url(vix_url)}
     except Exception as e:
         print("Stream fetch error:", e)
         raise HTTPException(status_code=502, detail=f"Could not fetch stream: {e}")
+
+@app.get("/api/proxy")
+def hls_proxy(url: str = Query(..., description="Absolute vixcloud URL to proxy")):
+    """Transparent HLS proxy: fetches vixcloud content server-side with correct headers."""
+    import urllib.parse
+    try:
+        with httpx.Client(timeout=20.0, follow_redirects=True) as client:
+            r = client.get(url, headers=VIXCLOUD_HEADERS)
+            r.raise_for_status()
+            content_type = r.headers.get("content-type", "application/octet-stream")
+            # If it's an m3u8 playlist, rewrite internal URLs
+            if "mpegurl" in content_type or url.split("?")[0].endswith(".m3u8"):
+                body = rewrite_m3u8(r.text, url)
+                return Response(
+                    content=body.encode(),
+                    media_type="application/vnd.apple.mpegurl",
+                    headers={
+                        "Access-Control-Allow-Origin": "*",
+                        "Cache-Control": "no-cache",
+                    }
+                )
+            # Binary segment (ts / aac / key)
+            return Response(
+                content=r.content,
+                media_type=content_type,
+                headers={"Access-Control-Allow-Origin": "*"},
+            )
+    except Exception as e:
+        print("Proxy error:", url[:80], e)
+        raise HTTPException(status_code=502, detail=f"Proxy error: {e}")
 
 @app.get("/api/episodes")
 def get_anime_episodes(

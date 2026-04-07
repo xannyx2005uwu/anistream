@@ -2,5 +2,6 @@ fastapi
 uvicorn
 httpx
 beautifulsoup4
+curl_cffi
 curl-cffi
 python-multipart
