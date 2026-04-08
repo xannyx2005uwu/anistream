@@ -14,7 +14,12 @@ const state = {
     currentItaEps: [],
     audioMode: 'sub',
     currentEpNumber: null,  // episode number currently playing
-    episodeSource: 'animeunity'
+    episodeSource: 'animeunity',
+    // AniList
+    anilistToken: localStorage.getItem('anilistToken'),
+    anilistUser: null,
+    currentAnilistId: null,
+    continueWatching: []
 };
 
 // Router singleton
@@ -33,11 +38,37 @@ const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 
 // Initial Load
+window.addEventListener('DOMContentLoaded', () => {
+    // Check if we are returning from AniList OAuth
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get('access_token');
+        if (token) {
+            localStorage.setItem('anilistToken', token);
+            state.anilistToken = token;
+            window.location.hash = ''; // Clean URL
+        }
+    }
+
+    if (state.anilistToken) {
+        window.verifyAnilistTokenOnLoad();
+    } else {
+        // Show promo modal if not logged in and not dismissed
+        if (!sessionStorage.getItem('anilistPromoDismissed')) {
+            setTimeout(() => {
+                const promo = document.getElementById('anilistPromoModal');
+                if (promo) promo.style.display = 'flex';
+            }, 800); // slight delay for dramatic effect
+        }
+    }
+});
+
 async function fetchCatalog() {
     state.isLoading = true;
     renderLoader();
     try {
-        const res = await fetch('/api/home');
+        const res = await fetch('/api/home', { cache: 'no-store' });
         const data = await res.json();
         
         state.catalog = data.data || {};
@@ -95,15 +126,18 @@ function renderLoader() {
     appDiv.innerHTML = `<div class="loader">Caricamento in corso...</div>`;
 }
 
-function renderCardsTemplate(animes) {
+function renderCardsTemplate(animes, isContinueWatching = false) {
+    if (!animes || !animes[Symbol.iterator]) return '';
     let sorted = [...animes];
-    if (state.filterGenre !== "ALL") {
-        sorted = sorted.filter(a => a.categories && a.categories.some(c => c.name.toLowerCase() === state.filterGenre.toLowerCase()));
-    }
-    if (state.filterSort === "DESC") {
-        sorted.sort((a,b) => (b.malVote || 0) - (a.malVote || 0));
-    } else if (state.filterSort === "ASC") {
-        sorted.sort((a,b) => (a.malVote || 0) - (b.malVote || 0));
+    if (!isContinueWatching) {
+        if (state.filterGenre !== "ALL") {
+            sorted = sorted.filter(a => a.categories && a.categories.some(c => c.name.toLowerCase() === state.filterGenre.toLowerCase()));
+        }
+        if (state.filterSort === "DESC") {
+            sorted.sort((a,b) => (b.malVote || 0) - (a.malVote || 0));
+        } else if (state.filterSort === "ASC") {
+            sorted.sort((a,b) => (a.malVote || 0) - (b.malVote || 0));
+        }
     }
     
     if (sorted.length === 0) return '';
@@ -113,7 +147,10 @@ function renderCardsTemplate(animes) {
             <img class="anime-card-img" src="${anime.image}" alt="${anime.name}" loading="lazy">
             <div class="anime-card-overlay">
                 <div class="anime-title">${anime.name}</div>
-                <div class="anime-vote">★ ${anime.malVote || '?'} / 10</div>
+                ${isContinueWatching 
+                    ? `<div class="anime-vote" style="color:#e0b0ff; text-shadow:0px 0px 5px #000;">Riprendi Ep. ${anime.progress} ▷</div>` 
+                    : `<div class="anime-vote">★ ${anime.malVote || '?'} / 10</div>`
+                }
             </div>
         </div>
     `).join("");
@@ -131,6 +168,20 @@ function renderHome() {
         const cards = renderCardsTemplate(state.searchResults);
         contentHtml = cards ? `<div class="anime-grid">${cards}</div>` : `<p>Nessun risultato trovato.</p>`;
     } else {
+        if (state.continueWatching && state.continueWatching.length > 0 && state.filterGenre === "ALL") {
+            const cards = renderCardsTemplate(state.continueWatching, true);
+            if (cards) {
+                contentHtml += `
+                    <div class="anime-row-container">
+                        <h2 class="anime-row-title" style="color:#a855f7;">▶ Continua a Guardare</h2>
+                        <div class="anime-row">
+                            ${cards}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
         // Render categorized horizontal rows (Netflix style)
         Object.keys(state.catalog).forEach(category => {
             // Optional: Skip genre specific rows if a different genre is explicitly selected
@@ -262,6 +313,7 @@ window.applyFilters = () => {
 // ---------------------- WATCH PAGE -------------------------
 
 async function renderWatchPage(id) {
+    state.currentAnilistId = id;
     renderLoader();
     try {
         const detRes = await fetch(`/api/anime?id=${id}`);
@@ -358,6 +410,17 @@ async function fetchEpisodes(title, countStr, englishTitle, anilistId) {
         const heading = document.querySelector('.episodes-section h2');
         if (heading) {
             heading.innerHTML = `Episodi Streaming <span style="font-size:0.55em;background:linear-gradient(135deg,#7b2cbf,#a855f7);padding:3px 10px;border-radius:20px;margin-left:12px;vertical-align:middle;">AnimeUnity ✨</span>`;
+        }
+
+        // AutoPlay if ?ep= is in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoEp = urlParams.get('ep');
+        if (autoEp) {
+            // Let the DOM update first, then click
+            setTimeout(() => {
+                const autoBtn = document.querySelector(`.episode-btn[data-epnum="${autoEp}"]`);
+                if (autoBtn) autoBtn.click();
+            }, 50);
         }
 
     } catch(e) {
@@ -490,6 +553,9 @@ window.playEpisode = async (auEpId, btnElement) => {
 
         // Pre-carica l'episodio successivo per abbattere i tempi di buffering futuri
         window.prefetchNextStream(btnElement);
+        
+        // Sync with AniList
+        window.syncAniListProgress(epNum);
     } catch(e) {
         console.error('Stream fetch error', e);
         playerBox.innerHTML = `<div style="color:red;text-align:center;padding:2rem">Errore caricamento stream: ${e.message}</div>`;
@@ -528,6 +594,159 @@ function playHLS(url, playerBox) {
         playerBox.innerHTML = `<div style="color:#a855f7;text-align:center;padding:2rem">Il tuo browser non supporta lo streaming HLS.</div>`;
     }
 }
+
+// ------------------------ ANILIST INTEGRATION ------------------------
+
+window.openAnilistModal = () => {
+    document.getElementById('anilistModal').style.display = 'flex';
+};
+
+window.closeAnilistModal = () => {
+    document.getElementById('anilistModal').style.display = 'none';
+};
+
+window.startAnilistAuth = () => {
+    const clientId = document.getElementById('anilistClientIdInput').value.trim();
+    const status = document.getElementById('anilistStatus');
+    if (!clientId) {
+        status.textContent = 'Devi inserire il Client ID!';
+        return;
+    }
+    
+    // Salva il client ID nel caso serva in futuro
+    localStorage.setItem('anilistClientId', clientId);
+    
+    // Reindirizza l'utente ad AniList per autorizzare Anistream
+    const authUrl = `https://anilist.co/api/v2/oauth/authorize?client_id=${clientId}&response_type=token`;
+    window.location.href = authUrl;
+};
+
+window.logoutAnilist = () => {
+    localStorage.removeItem('anilistToken');
+    state.anilistToken = null;
+    state.anilistUser = null;
+    window.updateAnilistNavBtn();
+};
+
+window.updateAnilistNavBtn = () => {
+    const btn = document.getElementById('anilistNavBtn');
+    if(btn) {
+        if (state.anilistUser) {
+            btn.innerHTML = `AniList: <strong style="color:white;">${state.anilistUser}</strong>`;
+            btn.style.color = '#a855f7';
+        } else {
+            btn.textContent = 'AniList Sync: Off';
+            btn.style.color = '';
+        }
+    }
+};
+
+window.verifyAnilistTokenOnLoad = async () => {
+    if (!state.anilistToken) return;
+    try {
+        const res = await fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${state.anilistToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ query: `query { Viewer { name } }` })
+        });
+        const data = await res.json();
+        if (data && data.data && data.data.Viewer) {
+            state.anilistUser = data.data.Viewer.name;
+            window.updateAnilistNavBtn();
+            window.fetchContinueWatching(); // Fetch progress list
+        } else {
+            localStorage.removeItem('anilistToken');
+            state.anilistToken = null;
+            window.updateAnilistNavBtn();
+        }
+    } catch(e) { } // Ignore network error on load
+};
+
+window.fetchContinueWatching = async () => {
+    if (!state.anilistUser || !state.anilistToken) return;
+    try {
+        const res = await fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${state.anilistToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                query: `query($name: String) {
+                  MediaListCollection(userName: $name, type: ANIME, status: CURRENT) {
+                    lists {
+                      entries {
+                        progress
+                        media {
+                          id
+                          title { romaji english }
+                          coverImage { large }
+                        }
+                      }
+                    }
+                  }
+                }`,
+                variables: { name: state.anilistUser }
+            })
+        });
+        const data = await res.json();
+        if (data && data.data && data.data.MediaListCollection && data.data.MediaListCollection.lists.length > 0) {
+            const entries = data.data.MediaListCollection.lists[0].entries || [];
+            state.continueWatching = entries.map(entry => {
+                const title = entry.media.title.english || entry.media.title.romaji;
+                return {
+                    name: title,
+                    image: entry.media.coverImage.large,
+                    link: `/play/${entry.media.id}?ep=${entry.progress}`,
+                    progress: entry.progress
+                };
+            }).sort((a,b) => b.progress - a.progress);
+        } else {
+            state.continueWatching = [];
+        }
+        // Update Home if we are currently looking at it
+        if (window.location.pathname === '/' || window.location.pathname === '') {
+            renderHome();
+        }
+    } catch(e) {
+        console.error("fetchContinueWatching error", e);
+    }
+};
+
+window.syncAniListProgress = async (epNum) => {
+    if (!state.anilistToken || !state.currentAnilistId) return;
+    try {
+        console.log(`Syncing progress to AniList: id ${state.currentAnilistId}, ep ${epNum}`);
+        await fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${state.anilistToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                query: `mutation ($mediaId: Int, $progress: Int) {
+                          SaveMediaListEntry (mediaId: $mediaId, progress: $progress, status: CURRENT) {
+                            id
+                            progress
+                            status
+                          }
+                        }`,
+                variables: {
+                    mediaId: parseInt(state.currentAnilistId),
+                    progress: parseInt(epNum)
+                }
+            })
+        });
+    } catch(e) {
+        console.error("Failed to sync AniList progress:", e);
+    }
+};
 
 // Start
 handleRoute();

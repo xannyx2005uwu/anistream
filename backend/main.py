@@ -237,6 +237,8 @@ def anilist_query(query: str, variables: dict = None):
             res.raise_for_status()
             return res.json().get("data", {})
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print("Anilist Query Error:", e)
         return {}
 

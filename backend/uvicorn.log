@@ -1,11 +1,374 @@
-INFO:     Started server process [7418]
+INFO:     Will watch for changes in these directories: ['/Users/alessandrobirca/Desktop/anistream/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     Started reloader process [12363] using StatReload
+INFO:     Started server process [12366]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57303 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57307 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57315 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57315 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57315 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=182255 via 'sousou no frieren 2'
+AnimeUnity ✓ [dub] anilist=182255 via 'sousou no frieren 2'
+INFO:     127.0.0.1:57317 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&anilist_id=182255&c=10 HTTP/1.1" 200 OK
+Stream URL: https://vixcloud.co/playlist/616190?ub=1&token=026a5ee5bff54241e7aa79708181da8a&...
+INFO:     127.0.0.1:57317 - "GET /api/stream?ep_id=103708 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F616190%3Fub%3D1%26token%3D026a5ee5bff54241e7aa79708181da8a%26expires%3D1780789702%26h%3D1 HTTP/1.1" 200 OK
+Stream URL: https://vixcloud.co/playlist/630604?ub=1&token=44fc4d35b289be71d960d3a8b9c3d4ec&...
+INFO:     127.0.0.1:57349 - "GET /api/stream?ep_id=103883 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F616190%3Ftype%3Dvideo%26rendition%3D1080p%26token%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702%26edge%3Dau-u1-01 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fstorage%2Fenc.key HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/proxy?url=https%3A%2F%2Fau-u1-01.vix-content.net%2Fhls%2F10%2F8%2F73%2F8733241f-b31c-44a9-a3df-1ead7c949311%2Fvideo%2F1080p%2F0000-1242.ts%3Ftoken%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/proxy?url=https%3A%2F%2Fau-u1-01.vix-content.net%2Fhls%2F10%2F8%2F73%2F8733241f-b31c-44a9-a3df-1ead7c949311%2Fvideo%2F1080p%2F0001-1853.ts%3Ftoken%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/proxy?url=https%3A%2F%2Fau-u1-01.vix-content.net%2Fhls%2F10%2F8%2F73%2F8733241f-b31c-44a9-a3df-1ead7c949311%2Fvideo%2F1080p%2F0002-2295.ts%3Ftoken%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/proxy?url=https%3A%2F%2Fau-u1-01.vix-content.net%2Fhls%2F10%2F8%2F73%2F8733241f-b31c-44a9-a3df-1ead7c949311%2Fvideo%2F1080p%2F0175-9999.ts%3Ftoken%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57317 - "GET /api/proxy?url=https%3A%2F%2Fau-u1-01.vix-content.net%2Fhls%2F10%2F8%2F73%2F8733241f-b31c-44a9-a3df-1ead7c949311%2Fvideo%2F1080p%2F0176-9999.ts%3Ftoken%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u1-01.vix-content.net%2Fhls%2F10%2F8%2F73%2F8733241f-b31c-44a9-a3df-1ead7c949311%2Fvideo%2F1080p%2F0179-0880.ts%3Ftoken%3DS5nv3nwOt37n3UqSIiycJw%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F630604%3Fub%3D1%26token%3D44fc4d35b289be71d960d3a8b9c3d4ec%26expires%3D1780789702%26h%3D1 HTTP/1.1" 200 OK
+Stream URL: https://vixcloud.co/playlist/642025?ub=1&token=28cfeeddd9f7d2ab87fd8c9c43875e96&...
+INFO:     127.0.0.1:57365 - "GET /api/stream?ep_id=104015 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F630604%3Ftype%3Dvideo%26rendition%3D1080p%26token%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702%26edge%3Dau-u2-01 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57365 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fstorage%2Fenc.key HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0000-0797.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0001-2042.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0002-2283.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0003-2081.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0004-2298.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0005-1975.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0006-1758.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0007-1020.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0008-3886.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0009-2568.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0010-2181.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0011-1095.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0012-1293.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57363 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0013-1442.ts%3Ftoken%3DxjcAfeIyjZiD56T74od9JA%26expires%3D1780789702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57460 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57460 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57460 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/main.py", line 236, in anilist_query
+    res = client.post(ANILIST_URL, json=payload)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1144, in post
+    return self.request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
 Anilist Query Error: The read operation timed out
-INFO:     127.0.0.1:54076 - "GET /api/home HTTP/1.1" 200 OK
-Stream URL: https://vixcloud.co/playlist/199721?ub=1&token=232ea7f04ace8e1525dc27518a9cde01&...
-INFO:     127.0.0.1:54082 - "GET /api/stream?ep_id=48279 HTTP/1.1" 200 OK
-Stream URL: https://vixcloud.co/playlist/199721?ub=1&token=5175091b85b51ea3c61b35a1af85b89e&...
-INFO:     127.0.0.1:54093 - "GET /api/stream?ep_id=48279 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54095 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F199721%3Fub%3D1%26token%3D5175091b85b51ea3c61b35a1af85b89e%26expires%3D1780775405%26h%3D1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/home HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=182255 via 'sousou no frieren 2'
+AnimeUnity ✓ [dub] anilist=182255 via 'sousou no frieren 2'
+INFO:     127.0.0.1:57472 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&anilist_id=182255&c=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=182255 via 'sousou no frieren 2'
+AnimeUnity ✓ [dub] anilist=182255 via 'sousou no frieren 2'
+INFO:     127.0.0.1:57462 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&anilist_id=182255&c=10 HTTP/1.1" 200 OK
+Stream URL: https://vixcloud.co/playlist/630604?ub=1&token=d9d9fe272a09a70fa6424f0337b252b2&...
+INFO:     127.0.0.1:57462 - "GET /api/stream?ep_id=103883 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F630604%3Fub%3D1%26token%3Dd9d9fe272a09a70fa6424f0337b252b2%26expires%3D1780790117%26h%3D1 HTTP/1.1" 200 OK
+Stream URL: https://vixcloud.co/playlist/642025?ub=1&token=4cdde0b1b42d907cb6af73d51c12dfb3&...
+INFO:     127.0.0.1:57472 - "GET /api/stream?ep_id=104015 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F630604%3Ftype%3Dvideo%26rendition%3D1080p%26token%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117%26edge%3Dau-u2-01 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fstorage%2Fenc.key HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0000-0797.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0001-2042.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0002-2283.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/anime?id=182255 HTTP/1.1" 200 OK
+AnimeUnity ✓ [sub] anilist=182255 via 'sousou no frieren 2'
+AnimeUnity ✓ [dub] anilist=182255 via 'sousou no frieren 2'
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0003-2081.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/episodes?title=Sousou%20no%20Frieren%202nd%20Season&en=Frieren%3A%20Beyond%20Journey%E2%80%99s%20End%20Season%202&anilist_id=182255&c=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F630604%3Fub%3D1%26token%3Dd9d9fe272a09a70fa6424f0337b252b2%26expires%3D1780790117%26h%3D1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fplaylist%2F630604%3Ftype%3Dvideo%26rendition%3D1080p%26token%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117%26edge%3Dau-u2-01 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57472 - "GET /api/proxy?url=https%3A%2F%2Fvixcloud.co%2Fstorage%2Fenc.key HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0004-2298.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0000-0797.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0005-1975.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0001-2042.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0006-1758.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0002-2283.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0007-1020.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0003-2081.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0008-3886.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0004-2298.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0009-2568.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0005-1975.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0010-2181.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0006-1758.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0011-1095.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0007-1020.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0012-1293.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0008-3886.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0013-1442.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0009-2568.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0010-2181.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0011-1095.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57462 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0012-1293.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57490 - "GET /api/proxy?url=https%3A%2F%2Fau-u2-01.vix-content.net%2Fhls%2F7%2Ff%2F3b%2Ff3ba1ab5-a414-4310-a3c7-c25004bd5d8f%2Fvideo%2F1080p%2F0013-1442.ts%3Ftoken%3DSjNAt4p6AuubH_kAon82Sg%26expires%3D1780790117 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57521 - "GET /api/search?keyword=re HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57542 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57542 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57547 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57542 - "GET /favicon.ico HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/main.py", line 236, in anilist_query
+    res = client.post(ANILIST_URL, json=payload)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1144, in post
+    return self.request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
+Anilist Query Error: The read operation timed out
+INFO:     127.0.0.1:57547 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57561 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57581 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57581 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57582 - "GET /style.css HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/main.py", line 236, in anilist_query
+    res = client.post(ANILIST_URL, json=payload)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1144, in post
+    return self.request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
+Anilist Query Error: The read operation timed out
+INFO:     127.0.0.1:57581 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57591 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57591 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57594 - "GET /app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57591 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57594 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57622 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57622 - "GET /app.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57623 - "GET /style.css HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/main.py", line 236, in anilist_query
+    res = client.post(ANILIST_URL, json=payload)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1144, in post
+    return self.request(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout: The read operation timed out
+Anilist Query Error: The read operation timed out
+INFO:     127.0.0.1:57622 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57627 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57627 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57630 - "GET /app.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57627 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57630 - "GET /api/home HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57627 - "GET /api/search?keyword=re HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57684 - "GET / HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:57684 - "GET /login.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57684 - "GET /favicon.ico HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:57685 - "POST /do-login HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:57685 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57685 - "GET /style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57686 - "GET /app.js?v=4 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57685 - "GET /favicon.ico HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57686 - "GET /api/home HTTP/1.1" 200 OK
+Traceback (most recent call last):
+  File "/Users/alessandrobirca/Desktop/anistream/backend/./venv/bin/uvicorn", line 8, in <module>
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/click/core.py", line 1161, in __call__
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/click/core.py", line 1082, in main
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/click/core.py", line 1443, in invoke
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/click/core.py", line 788, in invoke
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/uvicorn/main.py", line 423, in main
+    
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/uvicorn/main.py", line 588, in run
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/uvicorn/supervisors/basereload.py", line 53, in run
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/uvicorn/supervisors/basereload.py", line 72, in __next__
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/uvicorn/supervisors/statreload.py", line 32, in should_restart
+  File "/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages/uvicorn/supervisors/statreload.py", line 52, in iter_py_files
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1180, in rglob
+    for p in selector.select_from(self):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 600, in _select_from
+    for starting_point in self._iterate_directories(parent_path, is_dir, scandir):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 590, in _iterate_directories
+    for p in self._iterate_directories(path, is_dir, scandir):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 590, in _iterate_directories
+    for p in self._iterate_directories(path, is_dir, scandir):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 590, in _iterate_directories
+    for p in self._iterate_directories(path, is_dir, scandir):
+  [Previous line repeated 1 more time]
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 579, in _iterate_directories
+    with scandir(parent_path) as scandir_it:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/alessandrobirca/Desktop/anistream/backend/venv/lib/python3.9/site-packages'

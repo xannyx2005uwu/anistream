@@ -23,6 +23,7 @@
             </div>
             <div class="nav-links">
                 <a href="#" onclick="router.navigate('/')">Home</a>
+                <a href="#" id="anilistNavBtn" onclick="window.openAnilistModal()">AniList Sync: Off</a>
             </div>
         </div>
     </nav>
@@ -32,6 +33,38 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
-    <script src="/app.js" type="module"></script>
+    <script src="/app.js?v=4" type="module"></script>
+
+    <!-- AniList Modal -->
+    <div id="anilistModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="window.closeAnilistModal()">&times;</span>
+            <h2>Collega AniList</h2>
+            <p>Non riesci a trovare il Token Personale? Usiamo il metodo automatico!</p>
+            <p style="font-size: 0.85em; color: #a0a0a0; margin-top: 5px;">
+                Vai su <a href="https://anilist.co/settings/developer" target="_blank" style="color: #a855f7;">anilist.co/settings/developer</a> e clicca "Create New Client".<br>
+                Come Name metti "Anistream" e come Redirect URL metti <strong>http://localhost:8080/</strong><br>
+                Salva, e copia il numero <strong>Client ID</strong> (es: 12345) qui sotto.
+            </p>
+            <input type="text" id="anilistClientIdInput" placeholder="Inserisci il tuo Client ID (es: 12345)..." style="width: 100%; padding: 10px; margin-top: 15px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px;">
+            <button id="authAniListBtn" onclick="window.startAnilistAuth()" style="width: 100%; padding: 10px; background: #a855f7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Accedi ad AniList</button>
+            <div id="anilistStatus" style="margin-top: 10px; text-align: center; color: #fc8181; font-size: 0.9em;"></div>
+        </div>
+    </div>
+    <!-- AniList Promo Modal -->
+    <div id="anilistPromoModal" class="modal" style="display:none; z-index: 2000;">
+        <div class="modal-content promo-zoom" style="text-align: center; max-width: 450px; background: linear-gradient(145deg, #180924, #2a0b41); border: 2px solid #a855f7; box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);">
+            <div style="font-size: 3rem; margin-bottom: 10px;">✨</div>
+            <h2 style="color: #e0b0ff; font-size: 1.8rem; margin-bottom: 15px;">Sblocca il vero Potere!</h2>
+            <p style="color: #d1d5db; line-height: 1.5; margin-bottom: 20px; font-size: 1.05rem;">
+                Sapevi che puoi collegare <strong>AniList</strong> ad Anistream?<br><br>
+                Fallo ora per ottenere <strong>tracciamento super-rapido</strong>: potrai riprendere ogni episodio dal <strong>Continua a Guardare</strong> e la tua lista si aggiornerà in tempo reale senza dover far nulla!
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button onclick="document.getElementById('anilistPromoModal').style.display='none'; sessionStorage.setItem('anilistPromoDismissed', 'true');" style="padding: 10px 20px; background: transparent; color: #a0a0a0; border: 1px solid #555; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1;">Più tardi</button>
+                <button onclick="document.getElementById('anilistPromoModal').style.display='none'; window.openAnilistModal();" style="padding: 10px 20px; background: #a855f7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1.5; font-size: 1.1rem; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);">Collega Ora 🔥</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

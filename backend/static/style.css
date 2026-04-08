@@ -16,6 +16,55 @@
   padding: 0;
 }
 
+/* Modal Styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #1a1a1a;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.8);
+    border: 1px solid #333;
+}
+
+.promo-zoom {
+    animation: promoZoomInOut 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes promoZoomInOut {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #a0a0a0;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
 body {
   font-family: 'Outfit', sans-serif;
   background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-end) 100%);
@@ -459,8 +508,83 @@ main {
 }
 
 @media (max-width: 768px) {
-  .navbar { padding: 1rem 2rem; }
-  main { padding: 2rem; }
-  .watch-hero-content { flex-direction: column; text-align: center; }
-  .watch-info h1 { font-size: 2rem; }
+  .navbar {
+    padding: 1rem;
+  }
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .search-container {
+    order: 3;
+    width: 100%;
+    margin-top: 5px;
+  }
+  .search-input-row {
+    width: 100%;
+  }
+  .search-container input {
+    width: 100%;
+    flex: 1;
+  }
+  .nav-links {
+    margin-left: 0;
+    gap: 15px;
+  }
+  main {
+    padding: 1rem;
+    margin-top: 130px; /* Adjusting for wrapped navbar */
+  }
+  
+  /* Anime Grid Adjustments */
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+  }
+  .anime-card {
+    height: 170px;
+  }
+  
+  /* Watch Page */
+  .watch-hero {
+    height: auto;
+    padding: 1rem 0;
+  }
+  .watch-hero-content {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  .watch-cover-col {
+    width: 180px; /* smaller cover on mobile */
+  }
+  .watch-info {
+    width: 100%;
+  }
+  .watch-info h1 {
+    font-size: 1.8rem;
+  }
+  .episodes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+  .episode-btn {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+  .category-section h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* For very small devices */
+@media (max-width: 400px) {
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+  .anime-card {
+    height: 140px;
+  }
 }
