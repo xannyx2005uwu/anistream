@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from typing import Optional
 import os
 import httpx
+import certifi
 import json
 from bs4 import BeautifulSoup
 import difflib
@@ -232,7 +233,7 @@ def anilist_query(query: str, variables: dict = None):
         if variables:
             payload["variables"] = variables
         
-        with httpx.Client(timeout=10.0) as client:
+        with httpx.Client(timeout=10.0, verify=certifi.where()) as client:
             res = client.post(ANILIST_URL, json=payload)
             res.raise_for_status()
             return res.json().get("data", {})
